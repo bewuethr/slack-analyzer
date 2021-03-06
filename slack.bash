@@ -68,3 +68,26 @@ extractids() {
 		.[]
 	' employees.json
 }
+
+# Loop over all employees and fetch the timestamp of their first message; if the
+# user is deleted, also fetch their last message; print everything to
+# tenures.tsv
+tenurelookup() {
+	printf '%s\t%s\t%s\t%s\t%s\n' 'id' 'name' 'title' 'first' 'last'
+
+	local id name title deleted
+	while IFS=$'\t' read -r id name deleted title; do
+		local first
+		first=$(findfirst "$id" | msg2timestamp)
+
+		if [[ $deleted == 'true' ]]; then
+			local last
+			last=$(findlast "$id" | msg2timestamp)
+		fi
+
+		printf '%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$first" "$last"
+
+		unset id name title deleted first last
+		sleep 3
+	done < <(extractids | jq --raw-output '@tsv')
+} > tenures.tsv
