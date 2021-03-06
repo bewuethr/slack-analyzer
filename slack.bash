@@ -51,7 +51,14 @@ findlast() {
 
 # Extract timestamp from message search result
 msg2timestamp() {
-	jq '.messages.matches[0].ts | tonumber | todate'
+	jq --raw-output '
+		.messages.matches[0].ts |
+		if test("[.]") then
+			split(".")[0]
+		else
+			.
+		end
+	'
 }
 
 # Use .profile.real_name for names
