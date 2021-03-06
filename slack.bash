@@ -61,4 +61,10 @@ msg2timestamp() {
 	'
 }
 
-# Use .profile.real_name for names
+# Convert employees to input required for first/last lookup
+extractids() {
+	jq --compact-output '
+		map([.id, .profile.real_name, .deleted, .profile.title]) |
+		.[]
+	' employees.json
+}
