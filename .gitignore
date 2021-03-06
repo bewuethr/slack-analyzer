@@ -1,2 +1,4 @@
 bottoken
 usertoken
+*.json
+*.tsv
