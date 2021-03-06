@@ -91,3 +91,18 @@ tenurelookup() {
 		sleep 3
 	done < <(extractids | jq --raw-output '@tsv')
 } > tenures.tsv
+
+prettyprint() {
+	sed '1d' tenures.tsv \
+		| sort --numeric-sort --key=4,4 --field-separator=$'\t' \
+		| awk --field-separator='\t' --assign OFS='\t' '
+			$4 {
+				$4 = strftime("%F", $4)
+				if ($5)
+					$5 = strftime("%F", $5)
+				print
+			}
+		' \
+		| nl \
+		| column --table --separator=$'\t' --table-truncate=4
+}
