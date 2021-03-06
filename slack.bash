@@ -4,7 +4,7 @@ getusers() {
 		--silent \
 		--get \
 		--data 'pretty=1' \
-		--header  "Authorization: Bearer $BOT_TOKEN" \
+		--header "Authorization: Bearer $BOT_TOKEN" \
 		> users.json
 }
 
@@ -34,7 +34,7 @@ findmsg() {
 		--data 'count=1' \
 		--data 'sort=timestamp' \
 		--data "sort_dir=$dir" \
-		--header  "Authorization: Bearer $USER_TOKEN"
+		--header "Authorization: Bearer $USER_TOKEN"
 }
 
 # Find first message from user
