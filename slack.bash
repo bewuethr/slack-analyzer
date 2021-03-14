@@ -75,7 +75,7 @@ extractids() {
 tenurelookup() {
 	printf '%s\t%s\t%s\t%s\t%s\n' 'id' 'name' 'title' 'first' 'last'
 
-	local id name title deleted
+	local id name deleted title 
 	while IFS=$'\t' read -r id name deleted title; do
 		local first
 		first=$(findfirst "$id" | msg2timestamp)
