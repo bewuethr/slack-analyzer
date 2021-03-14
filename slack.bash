@@ -74,13 +74,13 @@ extractids() {
 	' employees.json
 }
 
-# Loop over all employees and fetch the timestamp of their first message; if the
+# Loop over all users and fetch the timestamp of their first message; if the
 # user is deleted, also fetch their last message; print everything to
 # tenures.tsv
 tenurelookup() {
 	printf '%s\t%s\t%s\t%s\t%s\n' 'id' 'name' 'title' 'first' 'last'
 
-	local id name deleted title 
+	local id name deleted title
 	while IFS=$'\t' read -r id name deleted title; do
 		local first
 		first=$(findfirst "$id" | msg2timestamp)
@@ -115,23 +115,74 @@ gettenure() {
 	}' tenures.tsv
 }
 
+# For each user, determine if new information might be available and fetch it
+# to update the record.
 tenureupdate() {
-	:
-	# Read ID and deleted
-	# Look up in tenures; possible outcomes:
-	# - first and last exist already; copy entry
-	# - only first exists
-	#   - deleted is false: copy entry
-	#   - deleted is true: find last, add to entry
-	# - no timestamp or ID does not exist
-	#   - deleted is false: find first
-	#   - deleted is true: find first and last
-	#
-	# Introduce status to avoid looking up people without messages repeatedly:
-	# - fresh: not deleted, has no messages
-	# - active: not deleted, has first message
-	# - alumnus: deleted, has first and last message
-	# - noshow: deleted, has no messages
+	printf '%s\t%s\t%s\t%s\t%s\t%s\n' 'id' 'name' 'title' 'status' 'first' 'last'
+
+	local id name deleted title
+	while IFS=$'\t' read -r id name deleted title; do
+		local first last
+		read -r first last <<< "$(gettenure "$id")"
+
+		local status
+		if [[ -n $last ]]; then
+			# Has two timestamps
+			if [[ $deleted == 'false' ]]; then
+				echo "User $id ($name) is in an invalid state" >&2
+				unset id name deleted title first last status
+				continue
+			fi
+			status='alum'
+			echo "User $id ($name) is still $status, copying entry"
+			unset id name deleted title first last status
+			continue
+		fi
+
+		if [[ -n $first ]]; then
+			# Has one timestamp
+			if [[ $deleted == 'false' ]]; then
+				status='active'
+				echo "User $id ($name) is $status, copying entry"
+				unset id name deleted title first last status
+				continue
+			fi
+
+			# Newly alum, get last
+			status='alum'
+			last=$(findlast "$id" | msg2timestamp)
+			sleep 3
+			echo "User $id ($name) is newly $status, updating entry with $last"
+			unset id name deleted title first last status
+			continue
+		fi
+
+		# Has no timestamps
+		if [[ $deleted == 'false' ]]; then
+			# Fresh user
+			status='fresh'
+			first=$(findfirst "$id" | msg2timestamp)
+			sleep 3
+			if [[ -n $first ]]; then
+				status='active'
+			fi
+			echo "New user $id ($name) is $status"
+			unset id name deleted title first last status
+			continue
+		fi
+
+		# Might never have said anything, or joined and left since last check
+		status='noshow'
+		if first=$(findfirst "$id" | msg2timestamp); then
+			sleep 3
+			last=$(findlast "$id" | msg2timestamp)
+			sleep 3
+			status='alum'
+		fi
+
+		echo "User $id ($name) is $status"
+		unset id name deleted title first last status
+	done < <(extractids | jq --raw-output '@tsv')
 }
 
 prettyprint() {
