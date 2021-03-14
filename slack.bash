@@ -97,16 +97,12 @@ tenurelookup() {
 	done < <(extractids | jq --raw-output '@tsv')
 } > tenures.tsv
 
-# Print an array of timestamps, where the first element is for the first ever
-# message of the provided user, and the second element for the last ever
-# message. If tenures.tsv has no timestamps for a user, the array has length
-# zero.  If the user doesn't exist, a non-zero exit status is returned.
+# Print blank-separated timestamps, where the first timestamp is for the first
+# ever message of the provided user, and the second one for the last ever
+# message. If tenures.tsv has no timestamps for a user, or if the user doesn't
+# exist, nothing is printed.
 gettenure() {
 	local id=$1
-	if ! cut --fields=1 tenures.tsv | grep --silent --fixed-strings "$1"; then
-		return 1
-	fi
-
 	awk --field-separator '\t' --assign id="$id" '
 		$1 == id {
 			if ($4) {
