@@ -52,16 +52,16 @@ findlast() {
 # Extract timestamp from message search result; return non-zero exit status if
 # user has no messages at all
 msg2timestamp() {
-	if jq --exit-status '.messages.total == 0' > /dev/null; then
-		return 1
-	fi
-
 	jq --raw-output '
-		.messages.matches[0].ts |
-		if test("[.]") then
-			split(".")[0]
+		if .messages.total == 0 then
+			"" | halt_error(1)
 		else
-			.
+			.messages.matches[0].ts |
+			if test("[.]") then
+				split(".")[0]
+			else
+				.
+			end
 		end
 	'
 }
