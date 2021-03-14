@@ -183,7 +183,7 @@ tenureupdate() {
 		printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
 		unset id name deleted title first last status
 	done < <(extractids | jq --raw-output '@tsv')
-}
+} > tenuresv2.tsv
 
 prettyprint() {
 	sed '1d' tenures.tsv \
