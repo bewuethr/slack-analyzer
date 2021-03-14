@@ -92,6 +92,25 @@ tenurelookup() {
 	done < <(extractids | jq --raw-output '@tsv')
 } > tenures.tsv
 
+tenureupdate() {
+	:
+	# Read ID and deleted
+	# Look up in tenures; possible outcomes:
+	# - first and last exist already; copy entry
+	# - only first exists
+	#   - deleted is false: copy entry
+	#   - deleted is true: find last, add to entry
+	# - no timestamp or ID does not exist
+	#   - deleted is false: find first
+	#   - deleted is true: find first and last
+	#
+	# Introduce status to avoid looking up people without messages repeatedly:
+	# - fresh: not deleted, has no messages
+	# - active: not deleted, has first message
+	# - alumnus: deleted, has first and last message
+	# - noshow: deleted, has no messages
+}
+
 prettyprint() {
 	sed '1d' tenures.tsv \
 		| sort --numeric-sort --key=4,4 --field-separator=$'\t' \
