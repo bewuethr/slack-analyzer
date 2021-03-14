@@ -134,7 +134,7 @@ tenureupdate() {
 				continue
 			fi
 			status='alum'
-			echo "User $id ($name) is still $status, copying entry"
+			printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
 			unset id name deleted title first last status
 			continue
 		fi
@@ -143,7 +143,7 @@ tenureupdate() {
 			# Has one timestamp
 			if [[ $deleted == 'false' ]]; then
 				status='active'
-				echo "User $id ($name) is $status, copying entry"
+				printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
 				unset id name deleted title first last status
 				continue
 			fi
@@ -152,7 +152,7 @@ tenureupdate() {
 			status='alum'
 			last=$(findlast "$id" | msg2timestamp)
 			sleep 3
-			echo "User $id ($name) is newly $status, updating entry with $last"
+			printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
 			unset id name deleted title first last status
 			continue
 		fi
@@ -166,7 +166,7 @@ tenureupdate() {
 			if [[ -n $first ]]; then
 				status='active'
 			fi
-			echo "New user $id ($name) is $status"
+			printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
 			unset id name deleted title first last status
 			continue
 		fi
@@ -180,7 +180,7 @@ tenureupdate() {
 			status='alum'
 		fi
 
-		echo "User $id ($name) is $status"
+		printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
 		unset id name deleted title first last status
 	done < <(extractids | jq --raw-output '@tsv')
 }
