@@ -79,29 +79,6 @@ extractids() {
 	'
 }
 
-# Loop over all users and fetch the timestamp of their first message; if the
-# user is deleted, also fetch their last message; print everything to
-# tenures.tsv
-tenurelookup() {
-	printf '%s\t%s\t%s\t%s\t%s\n' 'id' 'name' 'title' 'first' 'last'
-
-	local id name deleted title
-	while IFS=$'\t' read -r id name deleted title; do
-		local first
-		first=$(findfirst "$id" | msg2timestamp)
-
-		if [[ $deleted == 'true' ]]; then
-			local last
-			last=$(findlast "$id" | msg2timestamp)
-		fi
-
-		printf '%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$first" "$last"
-
-		unset id name title deleted first last
-		sleep 3
-	done < <(extractids < employees.json)
-} > tenures.tsv
-
 # Print blank-separated timestamps, where the first timestamp is for the first
 # ever message of the provided user, and the second one for the last ever
 # message. If tenures.tsv has no timestamps for a user, or if the user doesn't
