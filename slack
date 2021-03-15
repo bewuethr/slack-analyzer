@@ -102,6 +102,8 @@ gettenure() {
 # For each user, determine if new information might be available and fetch it
 # to update the record.
 tenureupdate() {
+	local infile=$1
+
 	printf '%s\t%s\t%s\t%s\t%s\t%s\n' 'id' 'name' 'title' 'status' 'first' 'last'
 
 	local id name deleted title
@@ -166,7 +168,7 @@ tenureupdate() {
 
 		printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
 		unset id name deleted title first last status
-	done < <(extractids < employees.json)
+	done < <(extractids < "$infile")
 }
 
 # Filter for tenures.tsv to remove headers, drop status field, sort by join
@@ -206,7 +208,7 @@ tomarkdown() {
 }
 
 getemployees > employees.json
-tenureupdate > tenures_new.tsv
+tenureupdate employees.json > tenures_new.tsv
 diff tenures.tsv tenures_new.tsv > "update-$(date '+%F').diff"
 mv tenures_new.tsv tenures.tsv
 prettyprint < tenures.tsv | tocolumn
