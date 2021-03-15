@@ -167,20 +167,6 @@ tenureupdate() {
 	done < <(extractids < employees.json)
 } > tenures_new.tsv
 
-prettyprint() {
-	sed '1d' tenures.tsv \
-		| sort --numeric-sort --key=4,4 --field-separator=$'\t' \
-		| awk --field-separator='\t' --assign OFS='\t' '
-			$4 {
-				$4 = strftime("%F", $4)
-				if ($5)
-					$5 = strftime("%F", $5)
-				print
-			}
-		' \
-		| nl
-}
-
 prettyprintv2() {
 	sed '1d' tenuresv2.tsv \
 		| cut --fields=4 --complement \
