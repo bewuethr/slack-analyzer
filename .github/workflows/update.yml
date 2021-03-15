@@ -21,10 +21,10 @@ jobs:
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           USER_TOKEN: ${{ secrets.USER_TOKEN }}
-          run: |
-            ./slacktenure 'Tenures at company'
-            status=$(git status --porcelain docs)
-            if [[ -n $status ]]; then
-                git commit --all --message="Update tenures"
-                git push
-            fi
+        run: |
+          ./slacktenure 'Tenures at company'
+          status=$(git status --porcelain docs)
+          if [[ -n $status ]]; then
+              git commit --all --message="Update tenures"
+              git push
+          fi
