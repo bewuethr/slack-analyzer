@@ -70,12 +70,13 @@ msg2timestamp() {
 	'
 }
 
-# Convert employees to input required for first/last lookup
+# Convert user JSON to TSV input required for first/last lookup
 extractids() {
-	jq --compact-output '
+	jq --raw-output '
 		map([.id, .profile.real_name, .deleted, .profile.title]) |
-		.[]
-	' employees.json
+		.[] |
+		@tsv
+	'
 }
 
 # Loop over all users and fetch the timestamp of their first message; if the
@@ -98,7 +99,7 @@ tenurelookup() {
 
 		unset id name title deleted first last
 		sleep 3
-	done < <(extractids | jq --raw-output '@tsv')
+	done < <(extractids < employees.json)
 } > tenures.tsv
 
 # Print blank-separated timestamps, where the first timestamp is for the first
@@ -186,7 +187,7 @@ tenureupdate() {
 
 		printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
 		unset id name deleted title first last status
-	done < <(extractids | jq --raw-output '@tsv')
+	done < <(extractids < employees.json)
 } > tenuresv2.tsv
 
 prettyprint() {
