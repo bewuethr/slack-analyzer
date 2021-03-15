@@ -87,10 +87,10 @@ gettenure() {
 	local id=$1
 	awk --field-separator '\t' --assign id="$id" '
 		$1 == id {
-			if ($4) {
-				printf $4
-				if ($5) {
-					printf " " $5
+			if ($5) {
+				printf $5
+				if ($6) {
+					printf " " $6
 				}
 				print ""
 			}
@@ -165,7 +165,7 @@ tenureupdate() {
 		printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
 		unset id name deleted title first last status
 	done < <(extractids < employees.json)
-} > tenuresv2.tsv
+} > tenures_new.tsv
 
 prettyprint() {
 	sed '1d' tenures.tsv \
