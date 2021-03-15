@@ -167,8 +167,10 @@ tenureupdate() {
 	done < <(extractids < employees.json)
 } > tenures_new.tsv
 
-prettyprintv2() {
-	sed '1d' tenuresv2.tsv \
+# Filter for tenures.tsv to remove headers, drop status field, sort by join
+# date, convert Unix timestamp to YYYY-MM-DD, and add employee number
+prettyprint() {
+	sed '1d' \
 		| cut --fields=4 --complement \
 		| sort --numeric-sort --key=4,4 --field-separator=$'\t' \
 		| awk --field-separator='\t' --assign OFS='\t' '
@@ -182,10 +184,12 @@ prettyprintv2() {
 		| nl
 }
 
+# Filter for prettyprint output to terminal
 tocolumn() {
 	column --table --separator=$'\t' --table-truncate=4
 }
 
+# Filter for prettyprint output to Markdown
 tomarkdown() {
 	printf '%s\n\n' '# Tenures at company'
 	printf '%s | %s | %s | %s | %s | %s\n' '\#' "User ID" "Name" "Title" "Joined" "Left" \
