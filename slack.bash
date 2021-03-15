@@ -4,8 +4,7 @@ getusers() {
 		--silent \
 		--get \
 		--data 'pretty=1' \
-		--header "Authorization: Bearer $BOT_TOKEN" \
-		> users.json
+		--header "Authorization: Bearer $BOT_TOKEN"
 }
 
 # Remove bot and guest users
@@ -19,7 +18,12 @@ extractemployees() {
 			)
 			and .name != "slackbot"
 		))
-	' users.json > employees.json
+	'
+}
+
+# Fetch all users and extract employees
+getemployees() {
+	getusers | extractemployees > employees.json
 }
 
 # Retrieve first or last message for user from Slack API
