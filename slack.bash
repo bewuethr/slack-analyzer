@@ -223,5 +223,10 @@ tomarkdown() {
 	printf '%s | %s | %s | %s | %s | %s\n' '#' "User ID" "Name" "Title" "Joined" "Left" \
 		'-:' '-' '-' '-' '-' '-'
 
-	sed -E 's/^ +//;s/\|/\\|/g;s/\t/ | /g'
+	sed -E '
+		s/^ +//
+		s/\|/\\|/g
+		s/\t/ | /g
+		s/ +$//
+	'
 }
