@@ -1,0 +1,30 @@
+name: Update tenures
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 11,22 * * *
+
+env:
+  TZ: America/Toronto
+
+jobs:
+  Update:
+    name: Update tenures
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2.3.4
+
+      - name: Run slacktenure and push changes
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          USER_TOKEN: ${{ secrets.USER_TOKEN }}
+          run: |
+            ./slacktenure 'Tenures at company'
+            status=$(git status --porcelain docs)
+            if [[ -n $status ]]; then
+                git commit --all --message="Update tenures"
+                git push
+            fi
