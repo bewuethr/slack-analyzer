@@ -220,7 +220,7 @@ tenureupdate users.json > tenures_new.tsv
 rm users.json
 
 difffile="update-$(date '+%F').diff"
-diff tenures.tsv tenures_new.tsv > "$difffile"
+diff tenures.tsv tenures_new.tsv | tee "$difffile"
 mv tenures_new.tsv tenures.tsv
 
 if ! [[ -s $difffile ]]; then
@@ -229,5 +229,4 @@ if ! [[ -s $difffile ]]; then
 	exit
 fi
 
-prettyprint < tenures.tsv | tocolumn
 prettyprint < tenures.tsv | tomarkdown "$title" > tenures.md
