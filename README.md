@@ -48,6 +48,6 @@ limits.
   - `fresh`: user is active member of the workspace, but hasn't posted yet
   - `noshow`: user is marked `deleted` and never posted a message
 - [`tenures.md`](tenures.md) is the Markdown-formatted view of the same data
-  with no-shows removed, and human-readable datestamps, order by date of the
+  with no-shows removed, and human-readable datestamps, ordered by date of the
   first message
 - The `.diff` files contain the diffs of the TSV data between two updates
