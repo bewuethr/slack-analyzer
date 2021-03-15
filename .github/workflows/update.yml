@@ -23,7 +23,7 @@ jobs:
           USER_TOKEN: ${{ secrets.USER_TOKEN }}
         run: |
           ./slacktenure 'Tenures at company'
-          status=$(git status --porcelain docs)
+          status=$(git status --porcelain)
           if [[ -n $status ]]; then
               git commit --all --message="Update tenures"
               git push
