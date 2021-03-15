@@ -209,7 +209,16 @@ tomarkdown() {
 
 getemployees > employees.json
 tenureupdate employees.json > tenures_new.tsv
-diff tenures.tsv tenures_new.tsv > "update-$(date '+%F').diff"
+
+difffile="update-$(date '+%F').diff"
+diff tenures.tsv tenures_new.tsv > "$difffile"
 mv tenures_new.tsv tenures.tsv
+
+if ! [[ -s $difffile ]]; then
+	echo "Nothing changed!" >&2
+	rm "$difffile"
+	exit
+fi
+
 prettyprint < tenures.tsv | tocolumn
 prettyprint < tenures.tsv | tomarkdown > tenures.md
