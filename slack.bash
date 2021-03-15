@@ -196,8 +196,7 @@ prettyprint() {
 				print
 			}
 		' \
-		| nl \
-		| column --table --separator=$'\t' --table-truncate=4
+		| nl
 }
 
 prettyprintv2() {
@@ -212,6 +211,17 @@ prettyprintv2() {
 				print
 			}
 		' \
-		| nl \
-		| column --table --separator=$'\t' --table-truncate=4
+		| nl
+}
+
+tocolumn() {
+	column --table --separator=$'\t' --table-truncate=4
+}
+
+tomarkdown() {
+	printf '%s\n\n' '# Tenures at company'
+	printf '%s|%s|%s|%s|%s|%s\n' '#' "User ID" "Name" "Title" "Joined" "Left" \
+		'-:' '-' '-' '-' '-:' '-:'
+
+	sed -E 's/^ +//;s/\|/\\|/g;s/\t/|/g'
 }
