@@ -195,7 +195,7 @@ prettyprint() {
 
 # Filter for prettyprint output to terminal
 tocolumn() {
-	column --table --separator=$'\t' --table-truncate=4
+	column -t -s $'\t'
 }
 
 # Filter for prettyprint output to Markdown
