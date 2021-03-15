@@ -10,7 +10,7 @@ getusers() {
 }
 
 # Remove bot and guest users
-extractemployees() {
+extractfullusers() {
 	jq '
 		.members |
 		map(select(
@@ -23,9 +23,9 @@ extractemployees() {
 	'
 }
 
-# Fetch all users and extract employees
-getemployees() {
-	getusers | extractemployees
+# Fetch all users and extract full users
+getfullusers() {
+	getusers | extractfullusers
 }
 
 # Retrieve first or last message for user from Slack API
@@ -200,7 +200,8 @@ tocolumn() {
 
 # Filter for prettyprint output to Markdown
 tomarkdown() {
-	printf '%s\n\n' '# Tenures at company'
+	local title=$1
+	printf '%s\n\n' "# $title"
 	printf '%s | %s | %s | %s | %s | %s\n' '\#' "User ID" "Name" "Title" "Joined" "Left" \
 		'-:' '-' '-' '-' '-' '-'
 
@@ -212,8 +213,10 @@ tomarkdown() {
 	'
 }
 
-getemployees > employees.json
-tenureupdate employees.json > tenures_new.tsv
+title=${1:-Tenures}
+
+getfullusers > users.json
+tenureupdate users.json > tenures_new.tsv
 
 difffile="update-$(date '+%F').diff"
 diff tenures.tsv tenures_new.tsv > "$difffile"
@@ -226,4 +229,4 @@ if ! [[ -s $difffile ]]; then
 fi
 
 prettyprint < tenures.tsv | tocolumn
-prettyprint < tenures.tsv | tomarkdown > tenures.md
+prettyprint < tenures.tsv | tomarkdown "$title" > tenures.md
