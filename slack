@@ -89,8 +89,9 @@ gettenure() {
 	local id=$1
 	awk --field-separator '\t' --assign id="$id" '
 		$1 == id {
+			printf $4
 			if ($5) {
-				printf $5
+				printf " " $5
 				if ($6) {
 					printf " " $6
 				}
@@ -108,8 +109,8 @@ tenureupdate() {
 
 	local id name deleted title
 	while IFS=$'\t' read -r id name deleted title; do
-		local first last
-		read -r first last <<< "$(gettenure "$id")"
+		local oldstatus first last
+		read -r oldstatus first last <<< "$(gettenure "$id")"
 
 		local status
 		if [[ -n $last ]]; then
@@ -159,11 +160,15 @@ tenureupdate() {
 
 		# Might never have said anything, or joined and left since last check
 		status='noshow'
-		if first=$(findfirst "$id" | msg2timestamp); then
-			sleep 3
-			last=$(findlast "$id" | msg2timestamp)
-			sleep 3
-			status='alum'
+		if [[ $oldstatus != 'noshow' ]]; then
+			if first=$(findfirst "$id" | msg2timestamp); then
+				sleep 3
+				last=$(findlast "$id" | msg2timestamp)
+				sleep 3
+				status='alum'
+			else
+				sleep 3
+			fi
 		fi
 
 		printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
