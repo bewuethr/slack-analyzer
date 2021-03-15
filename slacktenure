@@ -219,7 +219,7 @@ getfullusers > users.json
 tenureupdate users.json > tenures_new.tsv
 rm users.json
 
-difffile="update-$(date '+%F').diff"
+difffile="update-$(date '+%F-%H').diff"
 diff tenures.tsv tenures_new.tsv | tee "$difffile"
 mv tenures_new.tsv tenures.tsv
 
