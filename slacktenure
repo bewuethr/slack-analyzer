@@ -84,12 +84,12 @@ extractids() {
 	'
 }
 
-# Print blank-separated timestamps, where the first timestamp is for the first
-# ever message of the provided user, and the second one for the last ever
-# message. If tenures.tsv has no timestamps for a user, or if the user doesn't
-# exist, nothing is printed.
+# Print user status and timestamps of the first and last ever message of the
+# provided user; a user can have a status and zero, one, or two timestamps; if
+# the user does not exist in infile (usually tenures.tsv), nothing is printed
 gettenure() {
 	local id=$1
+	local infile=$2
 	awk --field-separator '\t' --assign id="$id" '
 		$1 == id {
 			printf $4
@@ -100,7 +100,7 @@ gettenure() {
 				}
 				print ""
 			}
-	}' tenures.tsv
+	}' "$infile"
 }
 
 # For each user, determine if new information might be available and fetch it
@@ -113,7 +113,7 @@ tenureupdate() {
 	local id name deleted title
 	while IFS=$'\t' read -r id name deleted title; do
 		local oldstatus first last
-		read -r oldstatus first last <<< "$(gettenure "$id")"
+		read -r oldstatus first last <<< "$(gettenure "$id" tenures.tsv)"
 		local status=${oldstatus:=fresh}
 
 		case $oldstatus in
