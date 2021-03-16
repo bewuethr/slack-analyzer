@@ -213,7 +213,21 @@ tomarkdown() {
 	'
 }
 
+checkenvvars() {
+	local envvar
+	for envvar in BOT_TOKEN USER_TOKEN; do
+		if [[ -z ${!envvar} ]]; then
+			echo "$envvar must be set" >&2
+			return 1
+		fi
+	done
+
+	return 0
+}
+
 main() {
+	checkenvvars || exit 1
+
 	local title=${1:-Tenures}
 
 	getfullusers > users.json
