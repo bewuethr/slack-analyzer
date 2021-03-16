@@ -213,20 +213,25 @@ tomarkdown() {
 	'
 }
 
-title=${1:-Tenures}
+main() {
+	local title=${1:-Tenures}
 
-getfullusers > users.json
-tenureupdate users.json > tenures_new.tsv
-rm users.json
+	getfullusers > users.json
+	tenureupdate users.json > tenures_new.tsv
+	rm users.json
 
-difffile="update-$(date '+%F-%H').diff"
-diff --unified tenures.tsv tenures_new.tsv | tee "$difffile"
-mv tenures_new.tsv tenures.tsv
+	local difffile
+	difffile="update-$(date '+%F-%H').diff"
+	diff --unified tenures.tsv tenures_new.tsv | tee "$difffile"
+	mv tenures_new.tsv tenures.tsv
 
-if ! [[ -s $difffile ]]; then
-	echo "Nothing changed!" >&2
-	rm "$difffile"
-	exit
-fi
+	if ! [[ -s $difffile ]]; then
+		echo "Nothing changed!" >&2
+		rm "$difffile"
+		exit
+	fi
 
-prettyprint < tenures.tsv | tomarkdown "$title" > tenures.md
+	prettyprint < tenures.tsv | tomarkdown "$title" > tenures.md
+}
+
+[[ ${BASH_SOURCE[0]} == "$0" ]] && main "$@"
