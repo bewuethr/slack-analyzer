@@ -220,7 +220,7 @@ tenureupdate users.json > tenures_new.tsv
 rm users.json
 
 difffile="update-$(date '+%F-%H').diff"
-diff tenures.tsv tenures_new.tsv | tee "$difffile"
+diff --unified tenures.tsv tenures_new.tsv | tee "$difffile"
 mv tenures_new.tsv tenures.tsv
 
 if ! [[ -s $difffile ]]; then
