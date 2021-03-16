@@ -111,65 +111,35 @@ tenureupdate() {
 	while IFS=$'\t' read -r id name deleted title; do
 		local oldstatus first last
 		read -r oldstatus first last <<< "$(gettenure "$id")"
+		local status=${oldstatus:=fresh}
 
-		local status
-		if [[ -n $last ]]; then
-			# Has two timestamps
-			if [[ $deleted == 'false' ]]; then
-				echo "User $id ($name) is in an invalid state" >&2
-				unset id name deleted title first last status
-				continue
-			fi
-			status='alum'
-			printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
-			unset id name deleted title first last status
-			continue
-		fi
+		case $oldstatus in
+			'active')
+				if [[ $deleted == 'true' ]]; then
+					# Newly alum, get last
+					status='alum'
+					last=$(findlast "$id" | msg2timestamp)
+					sleep 3
+				fi
+				;;
 
-		if [[ -n $first ]]; then
-			# Has one timestamp
-			if [[ $deleted == 'false' ]]; then
-				status='active'
-				printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
-				unset id name deleted title first last status
-				continue
-			fi
+			'fresh')
+				if first=$(findfirst "$id" | msg2timestamp); then
+					sleep 3
+					status='active'
+				fi
 
-			# Newly alum, get last
-			status='alum'
-			last=$(findlast "$id" | msg2timestamp)
-			sleep 3
-			printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
-			unset id name deleted title first last status
-			continue
-		fi
-
-		# Has no timestamps
-		if [[ $deleted == 'false' ]]; then
-			# Fresh user
-			status='fresh'
-			first=$(findfirst "$id" | msg2timestamp)
-			sleep 3
-			if [[ -n $first ]]; then
-				status='active'
-			fi
-			printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
-			unset id name deleted title first last status
-			continue
-		fi
-
-		# Might never have said anything, or joined and left since last check
-		status='noshow'
-		if [[ $oldstatus != 'noshow' ]]; then
-			if first=$(findfirst "$id" | msg2timestamp); then
-				sleep 3
-				last=$(findlast "$id" | msg2timestamp)
-				sleep 3
-				status='alum'
-			else
-				sleep 3
-			fi
-		fi
+				if [[ $deleted == 'true' ]]; then
+					if [[ $status == 'active' ]]; then
+						status='alum'
+						last=$(findlast "$id" | msg2timestamp)
+						sleep 3
+					else
+						status='noshow'
+					fi
+				fi
+				;;
+		esac
 
 		printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
 		unset id name deleted title first last status
