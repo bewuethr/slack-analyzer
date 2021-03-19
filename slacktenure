@@ -206,7 +206,7 @@ main() {
 	rm users.json
 
 	local difffile
-	difffile="update-$(date '+%F-%H').diff"
+	difffile="diffs/update-$(date '+%F-%H').diff"
 	diff --unified tenures.tsv tenures_new.tsv | tee "$difffile"
 	mv tenures_new.tsv tenures.tsv
 
