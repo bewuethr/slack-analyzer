@@ -183,6 +183,7 @@ tomarkdown() {
 	'
 }
 
+# Make sure required environment variables are defined
 checkenvvars() {
 	local envvar
 	for envvar in BOT_TOKEN USER_TOKEN; do
