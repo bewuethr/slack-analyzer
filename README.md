@@ -51,4 +51,7 @@ limits.
 - [`tenures.md`](tenures.md) is the Markdown-formatted view of the same data
   with no-shows removed, and human-readable datestamps, ordered by date of the
   first message
-- The `.diff` files contain the diffs of the TSV data between two updates
+- [`tenurescurrent.md`](tenurescurrent.md) is the Markdown-formatted view of
+  the same data with only current employees
+- The `diffs/*.diff` files contain the unified diffs of the TSV data between
+  two updates
