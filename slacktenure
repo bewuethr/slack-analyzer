@@ -182,6 +182,16 @@ tocolumn() {
 	column --table --separator=$'\t' --table-truncate=4
 }
 
+# Filter to convert tab separated input to body of Markdown table
+mdtablebody() {
+	sed -E '
+		s/^ +//     # Remove leading blanks
+		s/\|/\\|/g  # Escape existing pipes
+		s/\t/ | /g  # Replace tabs with pipes
+		s/ +$//     # Remove trailing blanks
+	'
+}
+
 # Filter for prettyprint output to Markdown
 tomarkdown() {
 	local title=$1
@@ -189,12 +199,18 @@ tomarkdown() {
 	printf '%s | %s | %s | %s | %s | %s\n' '\#' "User ID" "Name" "Title" "Joined" "Left" \
 		'-:' '-' '-' '-' '-' '-'
 
-	sed -E '
-		s/^ +//
-		s/\|/\\|/g
-		s/\t/ | /g
-		s/ +$//
-	'
+	mdtablebody
+
+}
+
+# Filter for prettyprintcurrent output to Markdown
+tomarkdowncurrent() {
+	local title=$1
+	printf '%s\n\n' "# $title"
+	printf '%s | %s | %s | %s | %s\n' '\#' "User ID" "Name" "Title" "Joined" \
+		'-:' '-' '-' '-' '-'
+
+	mdtablebody
 }
 
 # Make sure required environment variables are defined
