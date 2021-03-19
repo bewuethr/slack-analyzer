@@ -163,6 +163,20 @@ prettyprint() {
 		| nl
 }
 
+# Filter for tenures.tsv to remove headers, sort by join date, filter for
+# active users, convert Unix timestamp to YYYY-MM-DD, and add current employee
+# number
+prettyprintcurrent() {
+	sed '1d' \
+		| sort --numeric-sort --key=5,5 --field-separator=$'\t' \
+		| awk --field-separator='\t' --assign OFS='\t' '
+			$4 == "active" {
+				print $1, $2, $3, strftime("%F", $5)
+			}
+		' \
+		| nl
+}
+
 # Filter for prettyprint output to terminal
 tocolumn() {
 	column --table --separator=$'\t' --table-truncate=4
