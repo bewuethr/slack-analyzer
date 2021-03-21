@@ -185,7 +185,7 @@ tocolumn() {
 
 # Filter to convert tab separated input to body of Markdown table
 mdtablebody() {
-	sed -E '
+	sed --regexp-extended '
 		s/^ +//     # Remove leading blanks
 		s/\|/\\|/g  # Escape existing pipes
 		s/\t/ | /g  # Replace tabs with pipes
