@@ -7,6 +7,14 @@ Slack analyzer provides `slacktenure`, a script to fetch all users from a Slack
 workspace and determine when they joined and potentially left the workspace.
 This is used as a proxy for tenure with a company.
 
+`slacktenure` takes one parameter, which is used as the title for the produced tables:
+
+```bash
+./slacktenure 'Tenures at Foo Corp'
+```
+
+If omitted, the titles default to just "Tenures".
+
 ## Assumptions
 
 - An employee is assumed to have joined the company at the date of their first
