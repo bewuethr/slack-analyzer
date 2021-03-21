@@ -229,16 +229,25 @@ checkenvvars() {
 	return 0
 }
 
+# Update link to diff file in README
+updatedifflink() {
+	local difffile=$1
+	sed --regexp-extended --in-place \
+		"s|(\[latest diff\])\((.*)\)|\1($difffile)|" README.md
+}
+
 main() {
 	checkenvvars || exit 1
 
 	local title=${1:-Tenures}
 
+	# Update data
 	getfullusers > users.json
 	[[ -e tenures.tsv ]] || touch tenures.tsv
 	tenureupdate users.json tenures.tsv > tenures_new.tsv
 	rm users.json
 
+	# Prepare diff
 	local difffile
 	difffile="diffs/update-$(date '+%F-%H').diff"
 	diff --unified tenures.tsv tenures_new.tsv | tee "$difffile"
@@ -250,6 +259,9 @@ main() {
 		exit
 	fi
 
+	updatedifflink "$difffile"
+
+	# Update Markdown tables
 	prettyprint < tenures.tsv | tomarkdown "$title" > tenures.md
 	prettyprintcurrent < tenures.tsv \
 		| tomarkdowncurrent "$title, current" > tenurescurrent.md

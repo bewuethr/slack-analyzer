@@ -1,7 +1,7 @@
 # Slack analyzer
 
-**tl;dr: see [all tenures](tenures.md) and [current
-employees](tenurescurrent.md)**
+**tl;dr: see [all tenures](tenures.md), [current employees](tenurescurrent.md),
+and [latest diff](diffs/update-YYYY-MM-DD-HH.diff)**
 
 Slack analyzer provides `slacktenure`, a script to fetch all users from a Slack
 workspace and determine when they joined and potentially left the workspace.
