@@ -142,7 +142,8 @@ tenureupdate() {
 				;;
 		esac
 
-		printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$id" "$name" "$title" "$status" "$first" "$last"
+		printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+			"$id" "$name" "$title" "$status" "$first" "$last"
 		unset id name deleted title first last status
 	done < <(extractids < "$infile")
 }
@@ -197,7 +198,8 @@ mdtablebody() {
 tomarkdown() {
 	local title=$1
 	printf '%s\n\n' "# $title"
-	printf '%s | %s | %s | %s | %s | %s\n' '\#' "User ID" "Name" "Title" "Joined" "Left" \
+	printf '%s | %s | %s | %s | %s | %s\n' \
+		'\#' "User ID" "Name" "Title" "Joined" "Left" \
 		'-:' '-' '-' '-' '-' '-'
 
 	mdtablebody
@@ -249,7 +251,8 @@ main() {
 	fi
 
 	prettyprint < tenures.tsv | tomarkdown "$title" > tenures.md
-	prettyprintcurrent < tenures.tsv | tomarkdowncurrent "$title, current" > tenurescurrent.md
+	prettyprintcurrent < tenures.tsv \
+		| tomarkdowncurrent "$title, current" > tenurescurrent.md
 }
 
 [[ ${BASH_SOURCE[0]} == "$0" ]] && main "$@"
