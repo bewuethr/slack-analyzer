@@ -103,17 +103,18 @@ gettenure() {
 	}' "$infile"
 }
 
-# For each user, determine if new information might be available and fetch it
-# to update the record.
+# For each user in infile, determine if newer information than available in
+# datafile might exist and fetch it to update the record
 tenureupdate() {
 	local infile=$1
+	local datafile=$2
 
 	printf '%s\t%s\t%s\t%s\t%s\t%s\n' 'id' 'name' 'title' 'status' 'first' 'last'
 
 	local id name deleted title
 	while IFS=$'\t' read -r id name deleted title; do
 		local oldstatus first last
-		read -r oldstatus first last <<< "$(gettenure "$id" tenures.tsv)"
+		read -r oldstatus first last <<< "$(gettenure "$id" "$datafile")"
 		local status=${oldstatus:=fresh}
 
 		case $oldstatus in
@@ -232,7 +233,8 @@ main() {
 	local title=${1:-Tenures}
 
 	getfullusers > users.json
-	tenureupdate users.json > tenures_new.tsv
+	[[ -e tenures.tsv ]] || touch tenures.tsv
+	tenureupdate users.json tenures.tsv > tenures_new.tsv
 	rm users.json
 
 	local difffile
