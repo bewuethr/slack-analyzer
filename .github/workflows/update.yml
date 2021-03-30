@@ -32,11 +32,20 @@ jobs:
               git add diffs
               git commit --all --message="Update tenures"
               git push
+
               diffs=(diffs/*.diff)
               diff=${diffs[-1]}
-              msg=$(printf '%s\n' '```diff' "$(< "$diff")" '```' \
-                  | jq --raw-input --slurp '.')
-              echo "::set-output name=msg::$msg"
+
+              ref=${{ github.ref }}
+              ref=${ref##*/}
+              baseurl="https://github.com/${{ github.repository }}/blob/$ref"
+              links="[Diff]($baseurl/$diff)"
+              links+=" • [All tenures]($baseurl/tenures.md)"
+              links+=" • [Current tenures]($baseurl/tenurescurrent.md)"
+              printf -v msg '%s\n' "$links" '' '```diff' "$(< "$diff")" '```'
+              escapedmsg=$(jq --raw-input --slurp '.' <<< "$msg")
+
+              echo "::set-output name=msg::$escapedmsg"
           fi
 
       - name: Send Telegram message for change
