@@ -50,7 +50,7 @@ jobs:
 
       - name: Send Telegram message for change
         if: steps.slacktenure.outputs.msg != ''
-        uses: appleboy/telegram-action@v0.1.0
+        uses: appleboy/telegram-action@v0.1.1
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
