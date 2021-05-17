@@ -1,0 +1,29 @@
+#!/usr/bin/awk -f
+
+BEGIN {
+	FS = OFS = "\t"
+	PROCINFO["sorted_in"] = "@ind_str_asc"
+}
+
+NR == 1 { next }
+
+{
+	first = $5
+	last = $6
+
+	if (first) {
+		++months[strftime("%Y-%m", first)]["first"]
+	}
+
+	if (last) {
+		++months[strftime("%Y-%m", last)]["last"]
+	}
+}
+
+END {
+	print "month", "joined", "left", "total"
+	for (month in months) {
+		total += months[month]["first"] - months[month]["last"]
+		print month, months[month]["first"] + 0, months[month]["last"] + 0, total
+	}
+}
