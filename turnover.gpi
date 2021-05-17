@@ -1,0 +1,25 @@
+filetype = ARG1
+set terminal filetype size 1024,600 background rgb "white"
+
+set output "turnover.".filetype
+
+set xdata time
+set timefmt "%Y-%m"
+set format x "%Y-%m"
+
+set grid
+set key left top
+set xtics right rotate by 45
+
+set boxwidth 0.8 relative
+set style fill solid 0.7
+boxwidth = 3600 * 24 * 20
+radius = boxwidth / 3
+
+plot "turnover.tsv" skip 1 using 1:4 with linespoints pointinterval 6 pointtype 7 pointsize 0.5 title "Total", \
+	'' skip 1 using 1:4:(strcol(4)) every 6 with labels offset 0,0.5 notitle, \
+	'' skip 1 using 1:2:(boxwidth) with boxes title "Joined", \
+	'' skip 1 using 1:2:($2 > 0 ? strcol(2) : "") with labels offset 0,0.5 notitle, \
+	'' skip 1 using 1:(-$3):(boxwidth) with boxes title "Left", \
+	'' skip 1 using 1:(-$3):($3 > 0 ? "-".strcol(3) : "") with labels offset 0,-0.5 notitle
+
