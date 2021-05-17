@@ -3,6 +3,8 @@
 **tl;dr: see [all tenures](tenures.md), [current employees](tenurescurrent.md),
 and [latest diff](diffs/update-YYYY-MM-DD-HH.diff)**
 
+![Employee turnover over time](turnover.svg)
+
 Slack analyzer provides `slacktenure`, a script to fetch all users from a Slack
 workspace and determine when they joined and potentially left the workspace.
 This is used as a proxy for tenure with a company.
