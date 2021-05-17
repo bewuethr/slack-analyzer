@@ -51,6 +51,8 @@ limits.
 
 ## Files
 
+### Tenure updates
+
 - [`tenures.tsv`](tenures.tsv) contains the tab-separated data for all users with Slack ID,
   name, title, status, and Unix timestamp of first and last message, where
   applicable; status can be one of
@@ -65,3 +67,17 @@ limits.
   the same data with only current employees
 - The `diffs/*.diff` files contain the unified diffs of the TSV data between
   two updates
+
+### Turnover graph
+
+- [`generateturnover`](generateturnover) is an awk script that takes
+  `tenures.tsv` as an input and produces a data file for gnuplot with the
+  number of employees who have joined or left, and the employee total for each
+  month
+- [`turnover.tsv`](turnover.tsv) is the output of the awk script; it is
+  committed so it can serve as an indicator if the graph should be regenerated
+  or not
+- [`turnover.gpi`](turnover.gpi) is a gnuplot script to produce the turnover
+  graph with the employee total, and the monthly turnover; it requires a
+  terminal type as a parameter (see `update.yml` workflow for examples)
+- `turnover.svg` is the graph used in the README (see above)
