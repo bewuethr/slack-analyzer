@@ -1,4 +1,4 @@
-name: Update tenures
+name: Update tenures and graph
 
 on:
   workflow_dispatch:
@@ -9,8 +9,8 @@ env:
   TZ: America/Toronto
 
 jobs:
-  Update:
-    name: Update tenures
+  update:
+    name: Update tenures and graph
     runs-on: ubuntu-20.04
 
     steps:
@@ -23,12 +23,13 @@ jobs:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           USER_TOKEN: ${{ secrets.USER_TOKEN }}
         run: |
+          git config --global user.name 'github-actions'
+          git config --global user.email \
+              '41898282+github-actions[bot]@users.noreply.github.com'
+
           ./slacktenure 'Tenures at company'
           status=$(git status --porcelain)
           if [[ -n $status ]]; then
-              git config --global user.name 'github-actions'
-              git config --global user.email \
-                  '41898282+github-actions[bot]@users.noreply.github.com'
               git add diffs
               git commit --all --message="Update tenures"
               git push
@@ -56,3 +57,28 @@ jobs:
           token: ${{ secrets.TELEGRAM_TOKEN }}
           format: markdown
           message: ${{ fromJSON(steps.slacktenure.outputs.msg) }}
+
+      - name: Generate graph
+        id: graph
+        run: |
+          ./generateturnover tenures.tsv > turnover.tsv
+          status=$(git status --porcelain)
+          if [[ -n $status ]]; then
+              sudo apt-get install gnuplot-nox
+              gnuplot -c turnover.gpi svg
+              gnuplot -c turnover.gpi png
+
+              git commit --message="Update graph" -- turnover.{tsv,svg}
+              git push
+
+              echo "::set-output name=sendmsg::true"
+          fi
+
+      - name: Send Telegram message for graph
+        if: steps.graph.outputs.sendmsg
+        uses: appleboy/telegram-action@v0.1.1
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          photo: turnover.png
+          message: ' '
