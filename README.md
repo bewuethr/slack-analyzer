@@ -1,9 +1,10 @@
 # Slack analyzer
 
-**tl;dr: see [all tenures](tenures.md), [current employees](tenurescurrent.md),
-and [latest diff](diffs/update-YYYY-MM-DD-HH.diff)**
+**tl;dr: see [all tenures](outputs/tenures.md), [current
+employees](outputs/tenurescurrent.md), and [latest
+diff](diffs/update-YYYY-MM-DD-HH.diff)**
 
-![Employee turnover over time](turnover.svg)
+![Employee turnover over time](outputs/turnover.svg)
 
 Slack analyzer provides `slacktenure`, a script to fetch all users from a Slack
 workspace and determine when they joined and potentially left the workspace.
@@ -12,10 +13,13 @@ This is used as a proxy for tenure with a company.
 `slacktenure` takes one parameter, which is used as the title for the produced tables:
 
 ```bash
-./slacktenure 'Tenures at Foo Corp'
+scripts/slacktenure 'Tenures at Foo Corp'
 ```
 
 If omitted, the titles default to just "Tenures".
+
+Make sure to run `slacktenure` from the project root directory, or paths will
+be messed up.
 
 ## Assumptions
 
@@ -53,31 +57,32 @@ limits.
 
 ### Tenure updates
 
-- [`tenures.tsv`](tenures.tsv) contains the tab-separated data for all users with Slack ID,
-  name, title, status, and Unix timestamp of first and last message, where
-  applicable; status can be one of
+- [`data/tenures.tsv`](data/tenures.tsv) contains the tab-separated data for
+  all users with Slack ID, name, title, status, and Unix timestamp of first and
+  last message, where applicable; status can be one of
   - `active`: user is still active member of the workspace
   - `alum`: user is marked `deleted` and has a timestamp for their last message
   - `fresh`: user is active member of the workspace, but hasn't posted yet
   - `noshow`: user is marked `deleted` and never posted a message
-- [`tenures.md`](tenures.md) is the Markdown-formatted view of the same data
-  with no-shows removed, and human-readable datestamps, ordered by date of the
-  first message
-- [`tenurescurrent.md`](tenurescurrent.md) is the Markdown-formatted view of
-  the same data with only current employees
+- [`outputs/tenures.md`](outputs/tenures.md) is the Markdown-formatted view of
+  the same data with no-shows removed, and human-readable datestamps, ordered
+  by date of the first message
+- [`outputs/tenurescurrent.md`](outputs/tenurescurrent.md) is the
+  Markdown-formatted view of the same data with only current employees
 - The `diffs/*.diff` files contain the unified diffs of the TSV data between
   two updates
 
 ### Turnover graph
 
-- [`generateturnover`](generateturnover) is an awk script that takes
-  `tenures.tsv` as an input and produces a data file for gnuplot with the
-  number of employees who have joined or left, and the employee total for each
-  month
-- [`turnover.tsv`](turnover.tsv) is the output of the awk script; it is
-  committed so it can serve as an indicator if the graph should be regenerated
-  or not
-- [`turnover.gpi`](turnover.gpi) is a gnuplot script to produce the turnover
-  graph with the employee total, and the monthly turnover; it requires a
-  terminal type as a parameter (see `update.yml` workflow for examples)
-- `turnover.svg` is the graph used in the README (see above)
+- [`scripts/generateturnover`](scripts/generateturnover) is an awk script that
+  takes `data/tenures.tsv` as an input and produces a data file for gnuplot
+  with the number of employees who have joined or left, and the employee total
+  for each month
+- [`data/turnover.tsv`](data/turnover.tsv) is the output of the awk script; it
+  is committed so it can serve as an indicator if the graph should be
+  regenerated or not
+- [`scripts/turnover.gpi`](scripts/turnover.gpi) is a gnuplot script to produce
+  the turnover graph with the employee total, and the monthly turnover; it
+  requires a terminal type as a parameter (see `update.yml` workflow for
+  examples)
+- `outputs/turnover.svg` is the graph used in the README (see above)
