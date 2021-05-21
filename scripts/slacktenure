@@ -243,15 +243,15 @@ main() {
 
 	# Update data
 	getfullusers > users.json
-	[[ -e tenures.tsv ]] || touch tenures.tsv
-	tenureupdate users.json tenures.tsv > tenures_new.tsv
+	[[ -e data/tenures.tsv ]] || touch data/tenures.tsv
+	tenureupdate users.json data/tenures.tsv > data/tenures_new.tsv
 	rm users.json
 
 	# Prepare diff
 	local difffile
 	difffile="diffs/update-$(date '+%F-%H').diff"
-	diff --unified tenures.tsv tenures_new.tsv | tee "$difffile"
-	mv tenures_new.tsv tenures.tsv
+	diff --unified data/tenures.tsv data/tenures_new.tsv | tee "$difffile"
+	mv data/tenures_new.tsv data/tenures.tsv
 
 	if ! [[ -s $difffile ]]; then
 		echo "Nothing changed!" >&2
@@ -262,9 +262,9 @@ main() {
 	updatedifflink "$difffile"
 
 	# Update Markdown tables
-	prettyprint < tenures.tsv | tomarkdown "$title" > tenures.md
-	prettyprintcurrent < tenures.tsv \
-		| tomarkdowncurrent "$title, current" > tenurescurrent.md
+	prettyprint < data/tenures.tsv | tomarkdown "$title" > outputs/tenures.md
+	prettyprintcurrent < data/tenures.tsv \
+		| tomarkdowncurrent "$title, current" > outputs/tenurescurrent.md
 }
 
 [[ ${BASH_SOURCE[0]} == "$0" ]] && main "$@"
