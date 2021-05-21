@@ -27,7 +27,7 @@ jobs:
           git config --global user.email \
               '41898282+github-actions[bot]@users.noreply.github.com'
 
-          ./slacktenure 'Tenures at company'
+          scripts/slacktenure 'Tenures at company'
           status=$(git status --porcelain)
           if [[ -n $status ]]; then
               git add diffs
@@ -41,8 +41,8 @@ jobs:
               ref=${ref##*/}
               baseurl="https://github.com/${{ github.repository }}/blob/$ref"
               links="[Diff]($baseurl/$diff)"
-              links+=" • [All tenures]($baseurl/tenures.md)"
-              links+=" • [Current tenures]($baseurl/tenurescurrent.md)"
+              links+=" • [All tenures]($baseurl/outputs/tenures.md)"
+              links+=" • [Current tenures]($baseurl/outputs/tenurescurrent.md)"
               printf -v msg '%s\n' "$links" '' '```diff' "$(< "$diff")" '```'
               escapedmsg=$(jq --raw-input --slurp '.' <<< "$msg")
 
@@ -61,14 +61,15 @@ jobs:
       - name: Generate graph
         id: graph
         run: |
-          ./generateturnover tenures.tsv > turnover.tsv
+          scripts/generateturnover data/tenures.tsv > data/turnover.tsv
           status=$(git status --porcelain)
           if [[ -n $status ]]; then
               sudo apt-get install gnuplot-nox
-              gnuplot -c turnover.gpi svg
-              gnuplot -c turnover.gpi png
+              gnuplot -c scripts/turnover.gpi svg
+              gnuplot -c scripts/turnover.gpi png
 
-              git commit --message="Update graph" -- turnover.{tsv,svg}
+              git commit --message="Update graph" -- \
+                  data/turnover.tsv outputs/turnover.svg
               git push
 
               echo "::set-output name=sendmsg::true"
@@ -80,5 +81,5 @@ jobs:
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
-          photo: turnover.png
+          photo: outputs/turnover.png
           message: ' '
