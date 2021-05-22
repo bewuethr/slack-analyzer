@@ -1,8 +1,8 @@
 # Slack analyzer
 
-**tl;dr: see [all tenures](outputs/tenures.md), [current
-employees](outputs/tenurescurrent.md), and [latest
-diff](diffs/update-YYYY-MM-DD-HH.diff)**
+**tl;dr: see [all tenures](outputs/tenures.md),
+[current employees](outputs/tenurescurrent.md), and
+[latest diff](diffs/update-YYYY-MM-DD-HH.diff)**
 
 ![Employee turnover over time](outputs/turnover.svg)
 
