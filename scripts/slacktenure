@@ -103,11 +103,29 @@ gettenure() {
 	}' "$infile"
 }
 
+# Check corrfile to see if it contains corrected values for the user identified
+# by id; if so, print a comma-separated line with values indicating if the user
+# should be deleted ("true" or empty), an optional corrected first seen
+# timestamp, and an optional corrected last seen timestamp
+getcorrections() {
+	local corrfile=$1
+	local id=$2
+
+	[[ -r $corrfile ]] || return
+
+	awk --field-separator ',' --assign id="$id" '
+		BEGIN { OFS = "," }
+		$1 == id { print $2, $3, $4 }
+	' "$corrfile"
+}
+
 # For each user in infile, determine if newer information than available in
-# datafile might exist and fetch it to update the record
+# datafile might exist and fetch it to update the record; use corrfile to
+# override with manually corrected values
 tenureupdate() {
 	local infile=$1
 	local datafile=$2
+	local corrfile=$3
 
 	printf '%s\t%s\t%s\t%s\t%s\t%s\n' 'id' 'name' 'title' 'status' 'first' 'last'
 
@@ -142,9 +160,16 @@ tenureupdate() {
 				;;
 		esac
 
-		printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
-			"$id" "$name" "$title" "$status" "$first" "$last"
-		unset id name deleted title first last status
+		local delete corrfirst corrlast
+		IFS=, read -r delete corrfirst corrlast <<< "$(getcorrections "$corrfile" "$id")"
+		first=${corrfirst:-$first}
+		last=${corrlast:-$last}
+
+		if [[ $delete != 'true' ]]; then
+			printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+				"$id" "$name" "$title" "$status" "$first" "$last"
+		fi
+		unset id name deleted title first last status delete corrfirst corrlast
 	done < <(extractids < "$infile")
 }
 
@@ -244,7 +269,7 @@ main() {
 	# Update data
 	getfullusers > users.json
 	[[ -e data/tenures.tsv ]] || touch data/tenures.tsv
-	tenureupdate users.json data/tenures.tsv > data/tenures_new.tsv
+	tenureupdate users.json data/tenures.tsv data/corrections.csv > data/tenures_new.tsv
 	rm users.json
 
 	# Prepare diff
