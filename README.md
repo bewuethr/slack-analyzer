@@ -31,7 +31,7 @@ be messed up.
   don't show up in the final table
 - Employee numbers are assigned in ascending order of the timestamp of the
   first message; this isn't necessarily the true order, especially not for the
-  first few employees
+  first few employees &ndash; see `corrections.csv` below for a fix
 
 ## Environment
 
@@ -64,6 +64,16 @@ limits.
   - `alum`: user is marked `deleted` and has a timestamp for their last message
   - `fresh`: user is active member of the workspace, but hasn't posted yet
   - `noshow`: user is marked `deleted` and never posted a message
+- [`data/corrections.csv`](data/corrections.csv) is an optional file containing
+  corrections for known incorrect values; it uses four comma-separated columns:
+
+  | Heading  | Meaning                                            |
+  | -------- | -------------------------------------------------- |
+  | `id`     | the ID of the user to which the correction applies |
+  | `delete` | set to `true` if the user should be removed        |
+  | `first`  | Unix timestamp for join date                       |
+  | `last`   | Unix timestamp for departure date                  |
+  
 - [`outputs/tenures.md`](outputs/tenures.md) is the Markdown-formatted view of
   the same data with no-shows removed, and human-readable datestamps, ordered
   by date of the first message
