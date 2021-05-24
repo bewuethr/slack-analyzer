@@ -28,11 +28,12 @@ getfullusers() {
 	getusers | extractfullusers
 }
 
-# Retrieve first or last message for user from Slack API; sleep to avoid
-# hitting rate limit
+# Retrieve first or last message for user from Slack API; throw away response
+# and retry once when hitting rate limit
 findmsg() {
 	local userid=$1
 	local dir=$2
+
 	curl https://slack.com/api/search.messages \
 		--silent \
 		--get \
@@ -41,20 +42,30 @@ findmsg() {
 		--data 'count=1' \
 		--data 'sort=timestamp' \
 		--data "sort_dir=$dir" \
-		--header "Authorization: Bearer $USER_TOKEN"
-
-	sleep 3
+		--header "Authorization: Bearer $USER_TOKEN" \
+		--retry 1 \
+		| jq '
+			if (.ok | not) and .error == "ratelimited" then
+				empty
+			else
+				.
+			end
+		'
 }
 
 # Find first message from user
 findfirst() {
 	local userid=$1
+
+	echo "Getting first message for $userid..." >&2
 	findmsg "$userid" 'asc'
 }
 
 # Find last message from user
 findlast() {
 	local userid=$1
+
+	echo "Getting last message for $userid..." >&2
 	findmsg "$userid" 'desc'
 }
 
