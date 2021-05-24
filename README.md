@@ -47,8 +47,9 @@ To run `slacktenure`, these two variables have to be set in the environment:
   `from:<@USERID>`; this means that the result depends on the user who owns the
   `USER_TOKEN` and which private channels they have access to
 
-After each API call, the script sleeps for 3 seconds to avoid hitting rate
-limits.
+Calls to `search.messages` retry once on error; because curl respects the
+`Retry-After` header, this slows down requests just enough when hitting the
+rate limit.
 
 [1]: <https://api.slack.com/methods/users.list>
 [2]: <https://api.slack.com/methods/search.messages>
