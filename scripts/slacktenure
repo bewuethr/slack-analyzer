@@ -142,6 +142,15 @@ tenureupdate() {
 
 	local id name deleted title
 	while IFS=$'\t' read -r id name deleted title; do
+		# Get corrected data
+		local delete corrfirst corrlast
+		IFS=, read -r delete corrfirst corrlast <<< "$(getcorrections "$corrfile" "$id")"
+		if [[ $delete == 'true' ]]; then
+			# Skip deleted entry
+			unset id name deleted title delete corrfirst corrlast
+			continue
+		fi
+
 		local oldstatus first last
 		read -r oldstatus first last <<< "$(gettenure "$id" "$datafile")"
 		local status=${oldstatus:=fresh}
@@ -171,15 +180,12 @@ tenureupdate() {
 				;;
 		esac
 
-		local delete corrfirst corrlast
-		IFS=, read -r delete corrfirst corrlast <<< "$(getcorrections "$corrfile" "$id")"
+		# Use corrections where available
 		first=${corrfirst:-$first}
 		last=${corrlast:-$last}
 
-		if [[ $delete != 'true' ]]; then
-			printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
-				"$id" "$name" "$title" "$status" "$first" "$last"
-		fi
+		printf '%s\t%s\t%s\t%s\t%s\t%s\n' \
+			"$id" "$name" "$title" "$status" "$first" "$last"
 		unset id name deleted title first last status delete corrfirst corrlast
 	done < <(extractids < "$infile")
 }
