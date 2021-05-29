@@ -68,7 +68,7 @@ rate limit.
   | `delete` | set to `true` if the user should be removed        |
   | `first`  | Unix timestamp for join date                       |
   | `last`   | Unix timestamp for departure date                  |
-  
+
 - [`outputs/tenures.md`](outputs/tenures.md) is the Markdown-formatted view of
   the same data with no-shows removed, and human-readable datestamps, ordered
   by date of the first message
