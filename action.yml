@@ -1,0 +1,102 @@
+name: Slack analyzer
+
+author: Benjamin Wuethrich
+
+description: Analyze a Slack workspace over time
+
+branding:
+  icon: slack
+  color: orange
+
+inputs:
+
+  slack-bot-token:
+    description: Slack API bot token with users:read scope
+    required: true
+
+  slack-user-token:
+    description: Slack API user token with search:read scope
+    required: true
+
+  title:
+    description: Title used in output files
+    required: false
+    default: Tenures
+
+outputs:
+
+  diff-msg:
+    description: The generated diff, formatted for Telegram
+    value: ${{ steps.update.outputs.diff-msg }}
+
+  graph-path:
+    description: The path to the PNG of the generated graph
+    value: ${{ steps.graph.outputs.path }}
+
+runs:
+
+  using: composite
+
+  steps:
+
+    - name: Update tenures via Slack API
+      id: update
+      shell: bash
+      env:
+        BOT_TOKEN: ${{ inputs.slack-bot-token }}
+        USER_TOKEN: ${{ inputs.slack-user-token }}
+      run: |
+        git config --global user.name 'github-actions'
+        git config --global user.email \
+            '41898282+github-actions[bot]@users.noreply.github.com'
+
+        '${{ github.action_path }}/slacktenure' '${{ inputs.title }}'
+
+        if [[ -z $(git status --porcelain) ]]; then
+            exit 0
+        fi
+
+        git add diffs
+        git commit --all --message="Update tenures"
+        git push
+
+        diffs=(diffs/*.diff)
+        diff=${diffs[-1]}
+
+        ref=${{ github.ref }}
+        ref=${ref##*/}
+        baseurl="https://github.com/${{ github.repository }}/blob/$ref"
+        links="[Diff]($baseurl/$diff)"
+        links+=" • [All tenures]($baseurl/outputs/tenures.md)"
+        links+=" • [Current tenures]($baseurl/outputs/tenurescurrent.md)"
+        printf -v msg '%s\n' "$links" '' '```diff' "$(< "$diff")" '```'
+        escapedmsg=$(jq --raw-input --slurp '.' <<< "$msg")
+
+        echo "::set-output name=diff-msg::$escapedmsg"
+        echo 'continue=true' >> "$GITHUB_ENV"
+
+    - name: Update graph
+      id: graph
+      shell: bash
+      run: |
+        if [[ '${{ env.continue }}' != 'true' ]]; then
+            exit 0
+        fi
+
+        '${{ github.action_path }}/generateturnover' \
+            data/tenures.tsv > data/turnover.tsv
+
+        if [[ -z $(git status --porcelain) ]]; then
+            exit 0
+        fi
+
+        sudo apt-get install gnuplot-nox
+        for type in svg png; do
+            gnuplot -c '${{ github.action_path }}/turnover.gpi' "$type"
+        done
+
+        git commit --message="Update graph" -- \
+            data/turnover.tsv outputs/turnover.svg
+        git push
+
+        echo "::set-output name=path::outputs/turnover.png"
