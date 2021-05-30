@@ -272,7 +272,7 @@ checkenvvars() {
 }
 
 # Update README file
-udpatereadme() {
+updatereadme() {
 	local name=$1
 	local difffile=$2
 	local readme=$3
@@ -280,15 +280,24 @@ udpatereadme() {
 	cat <<- EOF > "$readme"
 		# Slack workspace analysis for $name
 
-		**[All tenures](tenures.md) &ndash;
-		[current employees](tenurescurrent.md) &ndash;
-		[latest diff]($difffile)**
+		**[All tenures][1] &ndash; [current employees][2] &ndash; [latest diff][3]**
+
+		- Raw data is in [\`data/tenures.tsv\`][4]
+		- Corrections are taken from [\`data/corrections.csv\`][5] if available
 
 		## Employee turnover over time
 
-		![Employee turnover over time](turnover.svg)
+		![Employee turnover over time][6]
 
-		<sub>Powered by [Slack analyzer](https://github.com/bewuethr/slack-analyzer)</sub>
+		<sub>Powered by [Slack analyzer][7]</sub>
+
+		[1]: <tenures.md>
+		[2]: <tenurescurrent.md>
+		[3]: <$difffile>
+		[4]: <data/tenures.tsv>
+		[5]: <data/corrections.csv>
+		[6]: <turnover.svg>
+		[7]: <https://github.com/bewuethr/slack-analyzer>
 	EOF
 }
 
