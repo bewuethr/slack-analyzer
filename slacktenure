@@ -317,7 +317,7 @@ main() {
 	local difffile
 	mkdir -p diffs
 	difffile="diffs/update-$(date '+%F-%H').diff"
-	diff --unified data/tenures.tsv data/tenures_new.tsv | tee "$difffile"
+	diff --unified=0 data/tenures.tsv data/tenures_new.tsv | tee "$difffile"
 	mv data/tenures_new.tsv data/tenures.tsv
 
 	if ! [[ -s $difffile ]]; then
@@ -331,7 +331,7 @@ main() {
 	# Update Markdown tables
 	prettyprint < data/tenures.tsv | tomarkdown "$name" > tenures.md
 	prettyprintcurrent < data/tenures.tsv \
-		| tomarkdowncurrent "$name, current" > tenurescurrent.md
+		| tomarkdowncurrent "$name" > tenurescurrent.md
 }
 
 [[ ${BASH_SOURCE[0]} == "$0" ]] && main "$@"
