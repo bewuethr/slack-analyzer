@@ -53,7 +53,7 @@ steps:
 
   - name: Update Slack workspace analysis
     id: update
-    uses: bewuethr/slack-analyzer@v1
+    uses: bewuethr/slack-analyzer@v0
     with:
       name: Foo Corp
       slack-bot-token: ${{ secrets.BOT_TOKEN }}
