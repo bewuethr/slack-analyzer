@@ -10,6 +10,10 @@ branding:
 
 inputs:
 
+  name:
+    description: Name used in file headings
+    required: true
+
   slack-bot-token:
     description: Slack API bot token with users:read scope
     required: true
@@ -17,11 +21,6 @@ inputs:
   slack-user-token:
     description: Slack API user token with search:read scope
     required: true
-
-  title:
-    description: Title used in output files
-    required: false
-    default: Tenures
 
 outputs:
 
@@ -50,7 +49,7 @@ runs:
         git config --global user.email \
             '41898282+github-actions[bot]@users.noreply.github.com'
 
-        '${{ github.action_path }}/slacktenure' '${{ inputs.title }}'
+        '${{ github.action_path }}/slacktenure' '${{ inputs.name }}'
 
         if [[ -z $(git status --porcelain) ]]; then
             exit 0
@@ -67,8 +66,8 @@ runs:
         ref=${ref##*/}
         baseurl="https://github.com/${{ github.repository }}/blob/$ref"
         links="[Diff]($baseurl/$diff)"
-        links+=" • [All tenures]($baseurl/outputs/tenures.md)"
-        links+=" • [Current tenures]($baseurl/outputs/tenurescurrent.md)"
+        links+=" • [All tenures]($baseurl/tenures.md)"
+        links+=" • [Current tenures]($baseurl/tenurescurrent.md)"
         printf -v msg '%s\n' "$links" '' '```diff' "$(< "$diff")" '```'
         escapedmsg=$(jq --raw-input --slurp '.' <<< "$msg")
 
@@ -96,7 +95,7 @@ runs:
         done
 
         git commit --message="Update graph" -- \
-            data/turnover.tsv outputs/turnover.svg
+            data/turnover.tsv turnover.svg
         git push
 
-        echo "::set-output name=path::outputs/turnover.png"
+        echo "::set-output name=path::turnover.png"

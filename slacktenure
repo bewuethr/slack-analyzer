@@ -238,8 +238,8 @@ mdtablebody() {
 
 # Filter for prettyprint output to Markdown
 tomarkdown() {
-	local title=$1
-	printf '%s\n\n' "# $title"
+	local name=$1
+	printf '%s\n\n' "# Tenures at $name"
 	printf '%s | %s | %s | %s | %s | %s\n' \
 		'\#' "User ID" "Name" "Title" "Joined" "Left" \
 		'-:' '-' '-' '-' '-' '-'
@@ -250,8 +250,8 @@ tomarkdown() {
 
 # Filter for prettyprintcurrent output to Markdown
 tomarkdowncurrent() {
-	local title=$1
-	printf '%s\n\n' "# $title"
+	local name=$1
+	printf '%s\n\n' "# Tenures at $name, current"
 	printf '%s | %s | %s | %s | %s\n' '\#' "User ID" "Name" "Title" "Joined" \
 		'-:' '-' '-' '-' '-'
 
@@ -271,26 +271,42 @@ checkenvvars() {
 	return 0
 }
 
-# Update link to diff file in README
-updatedifflink() {
-	local difffile=$1
-	sed --regexp-extended --in-place \
-		"s|(\[latest diff\])\((.*)\)|\1($difffile)|" README.md
+# Update README file
+udpatereadme() {
+	local name=$1
+	local difffile=$2
+	local readme=$3
+
+	cat <<- EOF > "$readme"
+		# Slack workspace analysis for $name
+
+		**[All tenures](tenures.md) &ndash;
+		[current employees](tenurescurrent.md) &ndash;
+		[latest diff]($difffile)**
+
+		## Employee turnover over time
+
+		![Employee turnover over time](turnover.svg)
+
+		<sub>Powered by [Slack analyzer](https://github.com/bewuethr/slack-analyzer)</sub>
+	EOF
 }
 
 main() {
 	checkenvvars || exit 1
 
-	local title=${1:-Tenures}
+	local name=$1
 
 	# Update data
 	getfullusers > users.json
+	mkdir -p data
 	[[ -e data/tenures.tsv ]] || touch data/tenures.tsv
 	tenureupdate users.json data/tenures.tsv data/corrections.csv > data/tenures_new.tsv
 	rm users.json
 
 	# Prepare diff
 	local difffile
+	mkdir -p diffs
 	difffile="diffs/update-$(date '+%F-%H').diff"
 	diff --unified data/tenures.tsv data/tenures_new.tsv | tee "$difffile"
 	mv data/tenures_new.tsv data/tenures.tsv
@@ -301,12 +317,12 @@ main() {
 		exit
 	fi
 
-	updatedifflink "$difffile"
+	updatereadme "$name" "$difffile" README.md
 
 	# Update Markdown tables
-	prettyprint < data/tenures.tsv | tomarkdown "$title" > outputs/tenures.md
+	prettyprint < data/tenures.tsv | tomarkdown "$name" > tenures.md
 	prettyprintcurrent < data/tenures.tsv \
-		| tomarkdowncurrent "$title, current" > outputs/tenurescurrent.md
+		| tomarkdowncurrent "$name, current" > tenurescurrent.md
 }
 
 [[ ${BASH_SOURCE[0]} == "$0" ]] && main "$@"
