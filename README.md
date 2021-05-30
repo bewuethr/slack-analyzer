@@ -1,19 +1,85 @@
 # Slack analyzer
 
-Slack analyzer provides `slacktenure`, a script to fetch all users from a Slack
-workspace and determine when they joined and potentially left the workspace.
-This is used as a proxy for tenure with a company.
+Slack analyzer is a GitHub Action to fetch all users from a Slack workspace and
+determine when they joined and potentially left the workspace. This is used as
+a proxy for tenure with a company.
 
-`slacktenure` takes one parameter, which is used as the title for the produced tables:
+The result is a README file with a graph showing turnover month over month, and
+two Markdown tables showing when the current employees joined, and the tenures
+of all employees ever. The README links to all relevant files.
 
-```bash
-scripts/slacktenure 'Tenures at Foo Corp'
+Optionally, the action output can be used to send the latest diff and the graph
+to a Telegram channel, using a separate action.
+
+## Inputs
+
+### `name`
+
+**Required** The name of the workspace/company to be used in the output file
+headings.
+
+### `slack-bot-token`
+
+**Required** A Slack API bot token with the `users:read` scope for the
+workspace; this is required to fetch the list of users from the workspace.
+
+### `slack-user-token`
+
+**Required** A Slack API user token with the `search:read` scope for the
+workspace; this is required to fetch the first and last message of a user.
+
+## Outputs
+
+### `diff-msg`
+
+The latest diff in tenures, formatted for Telegram and JSON-escaped. Use
+`fromJSON` to unescape. If there was no diff, the string is empty; this should
+be checked before trying to use the diff.
+
+### `graph-path`
+
+The path to the PNG version of the turnover graph for usage in a Telegram
+message (which does not support SVG). If no new graph was generated, the string
+is empty; this should be checked before trying to use the graph in a message.
+
+## Example usage
+
+This includes the optional Telegram notifications.
+
+```yaml
+steps:
+  - name: Check out repository
+    uses: actions/checkout@v2
+
+  - name: Update Slack workspace analysis
+    id: update
+    uses: bewuethr/slack-analyzer@v1
+    with:
+      name: Foo Corp
+      slack-bot-token: ${{ secrets.BOT_TOKEN }}
+      slack-user-token: ${{ secrets.USER_TOKEN }}
+
+  - name: Send Telegram message for change
+    # Don't send message if there is no diff
+    if: steps.update.outputs.diff-msg != ''
+    uses: appleboy/telegram-action@v0.1.1
+    with:
+      to: ${{ secrets.TELEGRAM_TO }}
+      token: ${{ secrets.TELEGRAM_TOKEN }}
+      format: markdown
+      message: ${{ fromJSON(steps.update.outputs.diff-msg) }}
+
+  - name: Send Telegram message for graph
+    # Don't send graph if it was not generated
+    if: steps.update.outputs.graph-path != ''
+    uses: appleboy/telegram-action@v0.1.1
+    with:
+      to: ${{ secrets.TELEGRAM_TO }}
+      token: ${{ secrets.TELEGRAM_TOKEN }}
+      photo: ${{ steps.update.outputs.graph-path }}
+      # Required to avoid sending separate extra message
+      message: ' '
 ```
-
-If omitted, the titles default to just "Tenures".
-
-Make sure to run `slacktenure` from the project root directory, or paths will
-be messed up.
 
 ## Assumptions
 
@@ -24,15 +90,9 @@ be messed up.
 - If somebody joins and leaves without ever posting a public message, they
   don't show up in the final table
 - Employee numbers are assigned in ascending order of the timestamp of the
-  first message; this isn't necessarily the true order, especially not for the
-  first few employees &ndash; see `corrections.csv` below for a fix
-
-## Environment
-
-To run `slacktenure`, these two variables have to be set in the environment:
-
-- `BOT_TOKEN`, set to a Slack API bot token with `users:read` scope
-- `USER_TOKEN`, set to a Slack API user token with `search:read` scope
+  first message; this isn't necessarily the true order, especially not for
+  employees who joined before the company started using Slack &ndash; see
+  `corrections.csv` below for a fix
 
 ## Slack API calls
 
@@ -48,19 +108,19 @@ rate limit.
 [1]: <https://api.slack.com/methods/users.list>
 [2]: <https://api.slack.com/methods/search.messages>
 
-## Files
+## Generated files
 
-### Tenure updates
-
-- [`data/tenures.tsv`](data/tenures.tsv) contains the tab-separated data for
-  all users with Slack ID, name, title, status, and Unix timestamp of first and
-  last message, where applicable; status can be one of
+- `README.md` contains the turnover graph and links to the other Markdown files
+  and data sources
+- `data/tenures.tsv` contains the tab-separated data for all users with Slack
+  ID, name, title, status, and Unix timestamp of first and last message, where
+  applicable; status can be one of
   - `active`: user is still active member of the workspace
   - `alum`: user is marked `deleted` and has a timestamp for their last message
   - `fresh`: user is active member of the workspace, but hasn't posted yet
   - `noshow`: user is marked `deleted` and never posted a message
-- [`data/corrections.csv`](data/corrections.csv) is an optional file containing
-  corrections for known incorrect values; it uses four comma-separated columns:
+- `data/corrections.csv` is an optional file containing corrections for known
+  incorrect values; it uses four comma-separated columns:
 
   | Heading  | Meaning                                            |
   | -------- | -------------------------------------------------- |
@@ -69,25 +129,14 @@ rate limit.
   | `first`  | Unix timestamp for join date                       |
   | `last`   | Unix timestamp for departure date                  |
 
-- [`outputs/tenures.md`](outputs/tenures.md) is the Markdown-formatted view of
-  the same data with no-shows removed, and human-readable datestamps, ordered
-  by date of the first message
-- [`outputs/tenurescurrent.md`](outputs/tenurescurrent.md) is the
-  Markdown-formatted view of the same data with only current employees
+- `tenures.md` is the Markdown-formatted view of the `data/tenures.tsv` with
+  no-shows removed, and human-readable datestamps, ordered by date of the first
+  message
+- `tenurescurrent.md` is the Markdown-formatted view of `tenures.tsv` with only
+  current employees
 - The `diffs/*.diff` files contain the unified diffs of the TSV data between
   two updates
-
-### Turnover graph
-
-- [`scripts/generateturnover`](scripts/generateturnover) is an awk script that
-  takes `data/tenures.tsv` as an input and produces a data file for gnuplot
-  with the number of employees who have joined or left, and the employee total
-  for each month
-- [`data/turnover.tsv`](data/turnover.tsv) is the output of the awk script; it
-  is committed so it can serve as an indicator if the graph should be
-  regenerated or not
-- [`scripts/turnover.gpi`](scripts/turnover.gpi) is a gnuplot script to produce
-  the turnover graph with the employee total, and the monthly turnover; it
-  requires a terminal type as a parameter (see `update.yml` workflow for
-  examples)
-- `outputs/turnover.svg` is the graph used in the README (see above)
+- `data/turnover.tsv` is generated from `tenures.tsv` to be used as input for
+  the script that generates the turnover graph; it is committed so it can serve
+  as an indicator if the graph should be regenerated or not
+- `turnover.svg` is the graph used in `README.md`
