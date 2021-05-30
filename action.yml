@@ -55,8 +55,8 @@ runs:
             exit 0
         fi
 
-        git add diffs
-        git commit --all --message="Update tenures"
+        git add data/tenures.tsv diffs *.md
+        git commit --message="Update tenures"
         git push
 
         diffs=(diffs/*.diff)
@@ -94,8 +94,8 @@ runs:
             gnuplot -c '${{ github.action_path }}/turnover.gpi' "$type"
         done
 
-        git commit --message="Update graph" -- \
-            data/turnover.tsv turnover.svg
+        git add data/turnover.tsv turnover.svg
+        git commit --message="Update graph"
         git push
 
         echo "::set-output name=path::turnover.png"
