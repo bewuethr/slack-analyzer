@@ -301,6 +301,12 @@ updatereadme() {
 	EOF
 }
 
+# Replace double quotes with single quotes so GitHub is not confused
+fixquotes() {
+	local fname=$1
+	sed --in-place 'y/"/'\''/' "$fname"
+}
+
 main() {
 	checkenvvars || exit 1
 
@@ -319,6 +325,8 @@ main() {
 	difffile="diffs/update-$(date '+%F-%H-%M').diff"
 	diff --unified=0 data/tenures.tsv data/tenures_new.tsv | tee "$difffile"
 	mv data/tenures_new.tsv data/tenures.tsv
+
+	fixquotes data/tenures.tsv
 
 	if ! [[ -s $difffile ]]; then
 		echo "Nothing changed!" >&2
