@@ -303,8 +303,7 @@ updatereadme() {
 
 # Replace double quotes with single quotes so GitHub is not confused
 fixquotes() {
-	local fname=$1
-	sed --in-place 'y/"/'\''/' "$fname"
+	sed 'y/"/'\''/'
 }
 
 main() {
@@ -316,7 +315,8 @@ main() {
 	getfullusers > users.json
 	mkdir -p data
 	[[ -e data/tenures.tsv ]] || touch data/tenures.tsv
-	tenureupdate users.json data/tenures.tsv data/corrections.csv > data/tenures_new.tsv
+	tenureupdate users.json data/tenures.tsv data/corrections.csv \
+		| fixquotes > data/tenures_new.tsv
 	rm users.json
 
 	# Prepare diff
@@ -325,8 +325,6 @@ main() {
 	difffile="diffs/update-$(date '+%F-%H-%M').diff"
 	diff --unified=0 data/tenures.tsv data/tenures_new.tsv | tee "$difffile"
 	mv data/tenures_new.tsv data/tenures.tsv
-
-	fixquotes data/tenures.tsv
 
 	if ! [[ -s $difffile ]]; then
 		echo "Nothing changed!" >&2
