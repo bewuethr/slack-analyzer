@@ -60,38 +60,57 @@ is empty; this should be checked before trying to use the graph in a message.
 This includes the optional Telegram notifications.
 
 ```yaml
-steps:
-  - name: Check out repository
-    uses: actions/checkout@v2
+name: Update tenures and graph
 
-  - name: Update Slack workspace analysis
-    id: update
-    uses: bewuethr/slack-analyzer@v0
-    with:
-      name: Foo Corp
-      slack-bot-token: ${{ secrets.BOT_TOKEN }}
-      slack-user-token: ${{ secrets.USER_TOKEN }}
+on:
+  # Manual trigger
+  workflow_dispatch:
 
-  - name: Send Telegram message for change
-    # Don't send message if there is no diff
-    if: steps.update.outputs.diff-msg != ''
-    uses: appleboy/telegram-action@v0.1.1
-    with:
-      to: ${{ secrets.TELEGRAM_TO }}
-      token: ${{ secrets.TELEGRAM_TOKEN }}
-      format: markdown
-      message: ${{ fromJSON(steps.update.outputs.diff-msg) }}
+  # Every day at 11:00 and 22:00 UTC
+  schedule:
+    - cron: 0 11,22 * * *
 
-  - name: Send Telegram message for graph
-    # Don't send graph if it was not generated
-    if: steps.update.outputs.graph-path != ''
-    uses: appleboy/telegram-action@v0.1.1
-    with:
-      to: ${{ secrets.TELEGRAM_TO }}
-      token: ${{ secrets.TELEGRAM_TOKEN }}
-      photo: ${{ steps.update.outputs.graph-path }}
-      # Required to avoid sending separate extra message
-      message: ' '
+env:
+  # Optionally set timezone
+  TZ: America/Toronto
+
+jobs:
+  update:
+    name: Update tenures and graph
+    runs-on: ubuntu-20.04
+
+  steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+  
+    - name: Update Slack workspace analysis
+      id: update
+      uses: bewuethr/slack-analyzer@v0
+      with:
+        name: Foo Corp
+        slack-bot-token: ${{ secrets.BOT_TOKEN }}
+        slack-user-token: ${{ secrets.USER_TOKEN }}
+  
+    - name: Send Telegram message for change
+      # Don't send message if there is no diff
+      if: steps.update.outputs.diff-msg != ''
+      uses: appleboy/telegram-action@v0.1.1
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        format: markdown
+        message: ${{ fromJSON(steps.update.outputs.diff-msg) }}
+  
+    - name: Send Telegram message for graph
+      # Don't send graph if it was not generated
+      if: steps.update.outputs.graph-path != ''
+      uses: appleboy/telegram-action@v0.1.1
+      with:
+        to: ${{ secrets.TELEGRAM_TO }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        photo: ${{ steps.update.outputs.graph-path }}
+        # Required to avoid sending separate extra message
+        message: ' '
 ```
 
 ## Assumptions
