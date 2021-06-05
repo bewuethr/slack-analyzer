@@ -13,6 +13,10 @@ of all employees ever. The README links to all relevant files.
 
 ![Sample graph](img/samplegraph.svg)
 
+| Example for all tenures             | Example for current tenures                         |
+| ----------------------------------- |---------------------------------------------------- |
+| ![Tenures](img/example-tenures.png) | ![Current tenures](img/example-tenures-current.png) |
+
 Optionally, the action output can be used to send the latest diff and the graph
 to a Telegram channel, using a separate action.
 
