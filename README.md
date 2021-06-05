@@ -20,6 +20,10 @@ of all employees ever. The README links to all relevant files.
 Optionally, the action output can be used to send the latest diff and the graph
 to a Telegram channel, using a separate action.
 
+| Example Telegram diff message          | Example Telegram graph message           |
+| -------------------------------------- | ---------------------------------------- |
+| ![Diff](img/telegram-diff-example.png) | ![Graph](img/telegram-graph-example.png) |
+
 ## Inputs
 
 ### `name`
