@@ -271,19 +271,28 @@ checkenvvars() {
 	return 0
 }
 
+# Drop lines mentioning corrections if the file does not exist
+dropcorrections() {
+	if [[ ! -e data/corrections.csv ]]; then
+		sed '\|data/corrections\.csv|d'
+	else
+		cat
+	fi
+}
+
 # Update README file
 updatereadme() {
 	local name=$1
 	local difffile=$2
 	local readme=$3
 
-	cat <<- EOF > "$readme"
+	cat <<- EOF | dropcorrections > "$readme"
 		# Slack workspace analysis for $name
 
 		**[All tenures][1] &ndash; [current employees][2] &ndash; [latest diff][3]**
 
 		- Raw data is in [\`data/tenures.tsv\`][4]
-		- Corrections are taken from [\`data/corrections.csv\`][5] if available
+		- Corrections are taken from [\`data/corrections.csv\`][5]
 
 		## Employee turnover over time
 
