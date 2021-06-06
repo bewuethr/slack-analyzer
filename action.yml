@@ -59,7 +59,9 @@ runs:
         git commit --message="Update tenures"
         git push
 
-        diffs=(diffs/*.diff)
+        shopt -s globstar
+
+        diffs=(diffs/**/*.diff)
         diff=${diffs[-1]}
 
         ref=${{ github.ref }}
