@@ -315,6 +315,14 @@ fixquotes() {
 	sed 'y/"/'\''/'
 }
 
+# Return path to new diff file and create directories if necessary
+getdifffile() {
+	local path
+	printf -v path 'diffs/%(%Y/%m)T' -2
+	mkdir --parents "$path"
+	printf '%s/update-%(%F-%H%M)T.diff' "$path" -2
+}
+
 main() {
 	checkenvvars || exit 1
 
@@ -322,7 +330,7 @@ main() {
 
 	# Update data
 	getfullusers > users.json
-	mkdir -p data
+	mkdir --parents data
 	[[ -e data/tenures.tsv ]] || touch data/tenures.tsv
 	tenureupdate users.json data/tenures.tsv data/corrections.csv \
 		| fixquotes > data/tenures_new.tsv
@@ -330,8 +338,7 @@ main() {
 
 	# Prepare diff
 	local difffile
-	mkdir -p diffs
-	difffile="diffs/update-$(date '+%F-%H-%M').diff"
+	difffile=$(getdifffile)
 	diff --unified=0 data/tenures.tsv data/tenures_new.tsv | tee "$difffile"
 	mv data/tenures_new.tsv data/tenures.tsv
 
