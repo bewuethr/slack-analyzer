@@ -35,7 +35,6 @@ Timestamps are in seconds since the Unix epoch. They can be determined using
 `date`: for example, if somebody's last message was really on 2021-05-01, the
 corresponding timestamp can be produced using
 
-
 ```console
 $ date --date=2021-05-01 +%s
 1619841600
