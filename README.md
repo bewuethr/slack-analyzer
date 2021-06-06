@@ -82,7 +82,7 @@ jobs:
   steps:
     - name: Check out repository
       uses: actions/checkout@v2
-  
+
     - name: Update Slack workspace analysis
       id: update
       uses: bewuethr/slack-analyzer@v0
@@ -90,7 +90,7 @@ jobs:
         name: Foo Corp
         slack-bot-token: ${{ secrets.BOT_TOKEN }}
         slack-user-token: ${{ secrets.USER_TOKEN }}
-  
+
     - name: Send Telegram message for change
       # Don't send message if there is no diff
       if: steps.update.outputs.diff-msg != ''
@@ -100,7 +100,7 @@ jobs:
         token: ${{ secrets.TELEGRAM_TOKEN }}
         format: markdown
         message: ${{ fromJSON(steps.update.outputs.diff-msg) }}
-  
+
     - name: Send Telegram message for graph
       # Don't send graph if it was not generated
       if: steps.update.outputs.graph-path != ''
@@ -168,8 +168,8 @@ rate limit.
   message
 - `tenurescurrent.md` is the Markdown-formatted view of `tenures.tsv` with only
   current employees
-- The `diffs/*.diff` files contain the unified diffs of the TSV data between
-  two updates
+- The `diffs/YYYY/MM/*.diff` files contain the unified diffs of the TSV data
+  between two updates, grouped in year and month subdirectories
 - `data/turnover.tsv` is generated from `tenures.tsv` to be used as input for
   the script that generates the turnover graph; it is committed so it can serve
   as an indicator if the graph should be regenerated or not
