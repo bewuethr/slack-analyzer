@@ -11,7 +11,7 @@ The result is a README file with a graph showing turnover month over month, and
 two Markdown tables showing when the current employees joined, and the tenures
 of all employees ever. The README links to all relevant files.
 
-![Sample graph](img/samplegraph.svg)
+![Sample graph](img/example-graph.svg)
 
 | Example for all tenures             | Example for current tenures                         |
 | ----------------------------------- |---------------------------------------------------- |
@@ -22,7 +22,7 @@ to a Telegram channel, using a separate action.
 
 | Example Telegram diff message          | Example Telegram graph message           |
 | -------------------------------------- | ---------------------------------------- |
-| ![Diff](img/telegram-diff-example.png) | ![Graph](img/telegram-graph-example.png) |
+| ![Diff](img/example-telegram-diff.png) | ![Graph](img/example-telegram-graph.png) |
 
 ## Inputs
 
