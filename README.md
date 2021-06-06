@@ -161,6 +161,8 @@ rate limit.
   | `first`  | Unix timestamp for join date                       |
   | `last`   | Unix timestamp for departure date                  |
 
+  See [Manually correcting data from Slack][3] for more details.
+
 - `tenures.md` is the Markdown-formatted view of the `data/tenures.tsv` with
   no-shows removed, and human-readable datestamps, ordered by date of the first
   message
@@ -172,3 +174,5 @@ rate limit.
   the script that generates the turnover graph; it is committed so it can serve
   as an indicator if the graph should be regenerated or not
 - `turnover.svg` is the graph used in `README.md`
+
+[3]: <docs/corrections.md>
