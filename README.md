@@ -175,4 +175,7 @@ rate limit.
   as an indicator if the graph should be regenerated or not
 - `turnover.svg` is the graph used in `README.md`
 
+For more details about the implementation, see [Implementation notes][4].
+
 [3]: <docs/corrections.md>
+[4]: <docs/implementation.md>
