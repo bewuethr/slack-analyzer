@@ -26,7 +26,6 @@ set grid xtics ytics mytics linestyle 1, linestyle 2
 set boxwidth 0.8 relative
 set style fill solid 0.7
 boxwidth = 3600 * 24 * 20
-radius = boxwidth / 3
 
 plot "data/turnover.tsv" skip 1 using 1:4 with linespoints pointinterval 6 pointtype 7 pointsize 0.5 title "Total", \
 	'' skip 1 using 1:4:(strcol(4)) every 6 with labels textcolor rgbcolor "#707070" offset -1,0.5 notitle, \
