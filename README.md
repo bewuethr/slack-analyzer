@@ -113,6 +113,11 @@ jobs:
         message: ' '
 ```
 
+For details about using Telegram, see [Use a GitHub action to send Telegram
+messages][1].
+
+[1]: <docs/telegram.md>
+
 ## Assumptions
 
 - An employee is assumed to have joined the company at the date of their first
@@ -128,8 +133,8 @@ jobs:
 
 ## Slack API calls
 
-- Get all users: [`users.list`][1]
-- Find first/last message of a user: [`search.messages`][2], queried with
+- Get all users: [`users.list`][2]
+- Find first/last message of a user: [`search.messages`][3], queried with
   `from:<@USERID>`; this means that the result depends on the user who owns the
   `USER_TOKEN` and which private channels they have access to
 
@@ -137,8 +142,8 @@ Calls to `search.messages` retry once on error; because curl respects the
 `Retry-After` header, this slows down requests just enough when hitting the
 rate limit.
 
-[1]: <https://api.slack.com/methods/users.list>
-[2]: <https://api.slack.com/methods/search.messages>
+[2]: <https://api.slack.com/methods/users.list>
+[3]: <https://api.slack.com/methods/search.messages>
 
 ## Generated files
 
@@ -161,7 +166,7 @@ rate limit.
   | `first`  | Unix timestamp for join date                       |
   | `last`   | Unix timestamp for departure date                  |
 
-  See [Manually correcting data from Slack][3] for more details.
+  See [Manually correcting data from Slack][4] for more details.
 
 - `tenures.md` is the Markdown-formatted view of the `data/tenures.tsv` with
   no-shows removed, and human-readable datestamps, ordered by date of the first
@@ -175,7 +180,7 @@ rate limit.
   as an indicator if the graph should be regenerated or not
 - `turnover.svg` is the graph used in `README.md`
 
-For more details about the implementation, see [Implementation notes][4].
+For more details about the implementation, see [Implementation notes][5].
 
-[3]: <docs/corrections.md>
-[4]: <docs/implementation.md>
+[4]: <docs/corrections.md>
+[5]: <docs/implementation.md>
