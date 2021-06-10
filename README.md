@@ -8,8 +8,9 @@ determine when they joined and potentially left the workspace. This is used as
 a proxy for tenure with a company.
 
 The result is a README file with a graph showing turnover month over month, and
-two Markdown tables showing when the current employees joined, and the tenures
-of all employees ever. The README links to all relevant files.
+three Markdown tables showing when the current employees joined, the tenures of
+all employees ever by join date, and all tenures by duration. The README links
+to all relevant files.
 
 ![Sample graph](img/example-graph.svg)
 
@@ -173,6 +174,8 @@ rate limit.
   message
 - `tenurescurrent.md` is the Markdown-formatted view of `tenures.tsv` with only
   current employees
+- `tenuresduration.md` is like `tenures.md`, but ordered by duration instead of
+  join date
 - The `diffs/YYYY/MM/*.diff` files contain the unified diffs of the TSV data
   between two updates, grouped in year and month subdirectories
 - `data/turnover.tsv` is generated from `tenures.tsv` to be used as input for
