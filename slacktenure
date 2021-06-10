@@ -221,6 +221,22 @@ prettyprintcurrent() {
 		| nl
 }
 
+# Filter for tenures.tsv to remove headers, filter for active and alum users
+# and print length of tenure in days, then sort by longest tenure, descending,
+# and add ranking
+prettyprintduration() {
+	awk --assign now="$EPOCHSECONDS" '
+		BEGIN { FS = OFS = "\t" }
+		NR == 1 { next }
+		$5 {
+			$6 = $6 ? $6 : now
+			print $1, $2, $3, int(($6 - $5) / 24 / 3600)
+		}
+	' \
+		| sort --numeric-sort --key=4,4 --field-separator=$'\t' --reverse \
+		| nl
+}
+
 # Filter for prettyprint output to terminal
 tocolumn() {
 	column --table --separator=$'\t' --table-truncate=4
@@ -253,6 +269,15 @@ tomarkdowncurrent() {
 	local name=$1
 	printf '%s\n\n' "# Tenures at $name, current"
 	printf '%s | %s | %s | %s | %s\n' '\#' "User ID" "Name" "Title" "Joined" \
+		'-:' '-' '-' '-' '-'
+
+	mdtablebody
+}
+
+tomarkdownduration() {
+	local name=$1
+	printf '%s\n\n' "# Tenures at $name by duration"
+	printf '%s | %s | %s | %s | %s\n' '\#' "User ID" "Name" "Title" "Days" \
 		'-:' '-' '-' '-' '-'
 
 	mdtablebody
@@ -352,8 +377,12 @@ main() {
 
 	# Update Markdown tables
 	prettyprint < data/tenures.tsv | tomarkdown "$name" > tenures.md
+
 	prettyprintcurrent < data/tenures.tsv \
 		| tomarkdowncurrent "$name" > tenurescurrent.md
+
+	prettyprintduration < data/tenures.tsv \
+		| tomarkdownduration "$name" > tenuresduration.md
 }
 
 [[ ${BASH_SOURCE[0]} == "$0" ]] && main "$@"
