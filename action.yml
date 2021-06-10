@@ -70,6 +70,7 @@ runs:
         links="[Diff]($baseurl/$diff)"
         links+=" • [All tenures]($baseurl/tenures.md)"
         links+=" • [Current tenures]($baseurl/tenurescurrent.md)"
+        links+=" • [By duration]($baseurl/tenuresduration.md)"
         printf -v msg '%s\n' "$links" '' '```diff' "$(< "$diff")" '```'
         escapedmsg=$(jq --raw-input --slurp '.' <<< "$msg")
 
