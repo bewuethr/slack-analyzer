@@ -274,6 +274,7 @@ tomarkdowncurrent() {
 	mdtablebody
 }
 
+# Filter for prettyprintduration output to Markdown
 tomarkdownduration() {
 	local name=$1
 	printf '%s\n\n' "# Tenures at $name by duration"
@@ -314,24 +315,26 @@ updatereadme() {
 	cat <<- EOF | dropcorrections > "$readme"
 		# Slack workspace analysis for $name
 
-		**[All tenures][1] &ndash; [current employees][2] &ndash; [latest diff][3]**
+		**[All tenures][all] &ndash; [current employees][current] &ndash;
+		[by duration][duration] &ndash; [latest diff][latest]**
 
-		- Raw data is in [\`data/tenures.tsv\`][4]
-		- Corrections are taken from [\`data/corrections.csv\`][5]
+		- Raw data is in [\`data/tenures.tsv\`][tenures]
+		- Corrections are taken from [\`data/corrections.csv\`][corrections]
 
 		## Employee turnover over time
 
-		![Employee turnover over time][6]
+		![Employee turnover over time][turnover]
 
-		<sub>Powered by [Slack analyzer][7]</sub>
+		<sub>Powered by [Slack analyzer][analyzer]</sub>
 
-		[1]: <tenures.md>
-		[2]: <tenurescurrent.md>
-		[3]: <$difffile>
-		[4]: <data/tenures.tsv>
-		[5]: <data/corrections.csv>
-		[6]: <turnover.svg>
-		[7]: <https://github.com/bewuethr/slack-analyzer>
+		[all]:         <tenures.md>
+		[current]:     <tenurescurrent.md>
+		[duration]:    <tenuresduration.md>
+		[latest]:      <$difffile>
+		[tenures]:     <data/tenures.tsv>
+		[corrections]: <data/corrections.csv>
+		[turnover]:    <turnover.svg>
+		[analyzer]:    <https://github.com/bewuethr/slack-analyzer>
 	EOF
 }
 
