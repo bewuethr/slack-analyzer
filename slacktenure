@@ -101,7 +101,8 @@ extractids() {
 gettenure() {
 	local id=$1
 	local infile=$2
-	awk --field-separator '\t' --assign id="$id" '
+	awk --assign id="$id" '
+		BEGIN { FS = "\t" }
 		$1 == id {
 			printf $4
 			if ($5) {
@@ -124,8 +125,8 @@ getcorrections() {
 
 	[[ -r $corrfile ]] || return
 
-	awk --field-separator ',' --assign id="$id" '
-		BEGIN { OFS = "," }
+	awk --assign id="$id" '
+		BEGIN { FS = OFS = "," }
 		$1 == id { print $2, $3, $4 }
 	' "$corrfile"
 }
@@ -196,7 +197,8 @@ prettyprint() {
 	sed '1d' \
 		| cut --fields=4 --complement \
 		| sort --numeric-sort --key=4,4 --field-separator=$'\t' \
-		| awk --field-separator='\t' --assign OFS='\t' '
+		| awk '
+			BEGIN { FS = OFS = "\t" }
 			$4 {
 				$4 = strftime("%F", $4)
 				if ($5)
@@ -213,7 +215,8 @@ prettyprint() {
 prettyprintcurrent() {
 	sed '1d' \
 		| sort --numeric-sort --key=5,5 --field-separator=$'\t' \
-		| awk --field-separator='\t' --assign OFS='\t' '
+		| awk '
+			BEGIN { FS = OFS = "\t" }
 			$4 == "active" {
 				print $1, $2, $3, strftime("%F", $5)
 			}
