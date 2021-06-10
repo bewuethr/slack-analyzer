@@ -45,7 +45,9 @@ if there is no corrections file, the lines mentioning it are filtered.
 
 The Markdown tables are generated from `tenures.tsv` by removing the header
 row, sorting by the appropriate fields, and adding an employee number before
-inserting table markup.
+inserting table markup. The table with tenures ordered by duration takes the
+difference between join date and departure/current date to determine the tenure
+duration in days.
 
 The company name used in the tables and the README is taken from the argument
 provided to `slacktenure`.
