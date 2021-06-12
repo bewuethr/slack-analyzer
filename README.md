@@ -14,9 +14,13 @@ to all relevant files.
 
 ![Sample graph](img/example-graph.svg)
 
-| Example for all tenures             | Example for current tenures                         |
-| ----------------------------------- |---------------------------------------------------- |
-| ![Tenures](img/example-tenures.png) | ![Current tenures](img/example-tenures-current.png) |
+| Example for all tenures             |
+| ----------------------------------- |
+| ![Tenures](img/example-tenures.png) |
+
+| Example for current tenures                         | Example for tenures by duration                |
+|---------------------------------------------------- | ---------------------------------------------- |
+| ![Current tenures](img/example-tenures-current.png) | ![Durations](img/example-tenures-duration.png) |
 
 Optionally, the action output can be used to send the latest diff and the graph
 to a Telegram channel, using a separate action.
