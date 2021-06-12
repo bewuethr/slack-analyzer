@@ -5,7 +5,7 @@ author: Benjamin Wuethrich
 description: Analyze a Slack workspace over time
 
 branding:
-  icon: slack
+  icon: list
   color: orange
 
 inputs:
