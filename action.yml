@@ -49,7 +49,7 @@ runs:
         git config --global user.email \
             '41898282+github-actions[bot]@users.noreply.github.com'
 
-        '${{ github.action_path }}/slacktenure' '${{ inputs.name }}'
+        '${{ github.action_path }}/scripts/slacktenure' '${{ inputs.name }}'
 
         if [[ -z $(git status --porcelain) ]]; then
             exit 0
@@ -85,7 +85,7 @@ runs:
             exit 0
         fi
 
-        '${{ github.action_path }}/generateturnover' \
+        '${{ github.action_path }}/scripts/generateturnover' \
             data/tenures.tsv > data/turnover.tsv
 
         if [[ -z $(git status --porcelain) ]]; then
@@ -94,7 +94,7 @@ runs:
 
         sudo apt-get install gnuplot-nox
         for type in svg png; do
-            gnuplot -c '${{ github.action_path }}/turnover.gpi' "$type"
+            gnuplot -c '${{ github.action_path }}/scripts/turnover.gpi' "$type"
         done
 
         git add data/turnover.tsv turnover.svg

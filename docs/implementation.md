@@ -1,5 +1,7 @@
 # Implementation notes
 
+Scripts live in the `scripts` subdirectory.
+
 All functionality is spread over a Bash script (`slacktenure`), an awk script
 (`generateturnover`), and a gnuplot script (`turnover.gpi`). Two steps in the
 composite run steps action defined in `action.yml` tie everything together.
