@@ -261,7 +261,7 @@ tomarkdown() {
 	printf '%s\n\n' "# Tenures at $name"
 	printf '%s | %s | %s | %s | %s | %s\n' \
 		'\#' "User ID" "Name" "Title" "Joined" "Left" \
-		'-:' '-' '-' '-' '-' '-'
+		'--:' '---' '---' '---' '---' '---'
 
 	mdtablebody
 
@@ -272,7 +272,7 @@ tomarkdowncurrent() {
 	local name=$1
 	printf '%s\n\n' "# Tenures at $name, current"
 	printf '%s | %s | %s | %s | %s\n' '\#' "User ID" "Name" "Title" "Joined" \
-		'-:' '-' '-' '-' '-'
+		'--:' '---' '---' '---' '---'
 
 	mdtablebody
 }
@@ -282,7 +282,7 @@ tomarkdownduration() {
 	local name=$1
 	printf '%s\n\n' "# Tenures at $name by duration"
 	printf '%s | %s | %s | %s | %s\n' '\#' "User ID" "Name" "Title" "Days" \
-		'-:' '-' '-' '-' '-'
+		'--:' '---' '---' '---' '---'
 
 	mdtablebody
 }
