@@ -287,6 +287,14 @@ tomarkdownduration() {
 	mdtablebody
 }
 
+# Filter for stats output to Markdown
+tomarkdownstats() {
+	printf '%s | %s\n' 'What' 'Value [days]' \
+		'---' '--:'
+
+	mdtablebody
+}
+
 # Make sure required environment variables are defined
 checkenvvars() {
 	local envvar
@@ -313,7 +321,8 @@ dropcorrections() {
 updatereadme() {
 	local name=$1
 	local difffile=$2
-	local readme=$3
+	local statstable=$3
+	local readme=$4
 
 	cat <<- EOF | dropcorrections > "$readme"
 		# Slack workspace analysis for $name
@@ -327,6 +336,10 @@ updatereadme() {
 		## Employee turnover over time
 
 		![Employee turnover over time][turnover]
+
+		## Tenure statistics
+
+		$statstable
 
 		<sub>Powered by [Slack analyzer][analyzer]</sub>
 
@@ -379,10 +392,19 @@ main() {
 		exit
 	fi
 
-	updatereadme "$name" "$difffile" README.md
+	local curdir=${BASH_SOURCE[0]%/*}
+
+	local statstable
+	statstable=$(prettyprintduration < data/tenures.tsv \
+		| cut --fields=5 \
+		| "$curdir/stats" \
+		| tomarkdownstats)
+
+	updatereadme "$name" "$difffile" "$statstable" README.md
 
 	# Update Markdown tables
-	prettyprint < data/tenures.tsv | tomarkdown "$name" > tenures.md
+	prettyprint < data/tenures.tsv \
+		| tomarkdown "$name" > tenures.md
 
 	prettyprintcurrent < data/tenures.tsv \
 		| tomarkdowncurrent "$name" > tenurescurrent.md
