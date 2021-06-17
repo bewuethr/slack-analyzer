@@ -341,6 +341,12 @@ updatereadme() {
 
 		$statstable
 
+		Boxplot: box from 25th to 75th percentile with a line at the median;
+		whiskers extend to the most distant point whose value lies within 1.5
+		times the interquartile range, and outliers are plotted separately
+
+		![Tenure boxplot][boxplot]
+
 		<sub>Powered by [Slack analyzer][analyzer]</sub>
 
 		[all]:         <tenures.md>
@@ -350,6 +356,7 @@ updatereadme() {
 		[tenures]:     <data/tenures.tsv>
 		[corrections]: <data/corrections.csv>
 		[turnover]:    <turnover.svg>
+		[boxplot]:     <boxplot.svg>
 		[analyzer]:    <https://github.com/bewuethr/slack-analyzer>
 	EOF
 }
