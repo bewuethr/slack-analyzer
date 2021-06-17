@@ -7,12 +7,13 @@ Slack analyzer is a GitHub Action to fetch all users from a Slack workspace and
 determine when they joined and potentially left the workspace. This is used as
 a proxy for tenure with a company.
 
-The result is a README file with a graph showing turnover month over month, and
-three Markdown tables showing when the current employees joined, the tenures of
-all employees ever by join date, and all tenures by duration. The README links
-to all relevant files.
+The result is a README file with a graph showing turnover month over month,
+some statistics and a boxplot for tenure durations, and three Markdown tables
+showing when the current employees joined, the tenures of all employees ever by
+join date, and all tenures by duration. The README links to all relevant files.
 
 ![Sample graph](img/example-graph.svg)
+![Sample boxplot](img/example-boxplot.svg)
 
 | Example for all tenures             |
 | ----------------------------------- |
@@ -186,6 +187,7 @@ rate limit.
   the script that generates the turnover graph; it is committed so it can serve
   as an indicator if the graph should be regenerated or not
 - `turnover.svg` is the graph used in `README.md`
+- `boxplot.svg` is the boxplot used in `README.md`
 
 For more details about the implementation, see [Implementation notes][5].
 
