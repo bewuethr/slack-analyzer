@@ -1,0 +1,16 @@
+set terminal svg size 500,500 background rgb "white"
+
+set output "boxplot.svg"
+
+set style data boxplot
+set style fill solid 0.5 border -1
+unset key
+
+set xtics ("Tenures in days" 1)
+set xtics nomirror
+set grid ytics
+set ytics nomirror
+
+set border 2
+
+plot "< cat -" using (1):1
