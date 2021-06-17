@@ -2,9 +2,10 @@
 
 Scripts live in the `scripts` subdirectory.
 
-All functionality is spread over a Bash script (`slacktenure`), an awk script
-(`generateturnover`), and a gnuplot script (`turnover.gpi`). Two steps in the
-composite run steps action defined in `action.yml` tie everything together.
+All functionality is spread over a Bash script (`slacktenure`), two awk scripts
+(`generateturnover` and `stats`), and two gnuplot scripts (`turnover.gpi` and
+`durationboxplot.gpi`). Three steps in the composite run steps action defined
+in `action.yml` tie everything together.
 
 ## Update user data and generate a diff
 
@@ -97,9 +98,20 @@ It draws four data series:
 The y-axis is labelled on both sides for every 50, but there are grid lines for
 every 10.
 
+## Generate statistics and a boxplot
+
+The `stats` awk script expects a single column of input and produces statistics
+with min/max values, mean, and median. The output is shown as a table in the
+generated README. The script is called from `slacktenure` using some of the
+prettyprint functions.
+
+`durationboxplot.gpi` expects the same input as `stats` and generates a boxplot
+for that data; it reads the data from standard input so no intermediate file is
+required.
+
 ## Tying everything together in a composite run steps action
 
-In `action.yml`, two run steps tie everything together.
+In `action.yml`, three run steps tie everything together.
 
 The first step runs `slacktenure` using the required `name` input as the
 parameter. If nothing changed, it exits.
@@ -126,5 +138,11 @@ PNG graph; as an output of the action overall, it's called `graph-path`.
 
 See the [main README][2] for a usage example of the outputs to send Telegram
 messages.
+
+The third step also installs gnuplot (unless that happened in the second step
+already), then sources `slacktenure` (which is written to not execute anything
+when sourced so it doubles as a library) and uses functions to produce input
+for `durationboxplot.gpi`. Then, the boxplot is generated and committed if it
+has changed.
 
 [2]: <../README.md>
