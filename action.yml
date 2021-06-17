@@ -93,6 +93,7 @@ runs:
         fi
 
         sudo apt-get install gnuplot-nox
+        echo 'gpinstalled=true' >> "$GITHUB_ENV"
         for type in svg png; do
             gnuplot -c '${{ github.action_path }}/scripts/turnover.gpi' "$type"
         done
@@ -102,3 +103,24 @@ runs:
         git push
 
         echo "::set-output name=path::turnover.png"
+
+    - name: Update boxplot
+      shell: bash
+      run: |
+        if [[ '${{ env.gpinstalled }}' != 'true' ]]; then
+            sudo apt-get install gnuplot-nox
+        fi
+
+        source '${{ github.action_path }}/scripts/slacktenure'
+
+        prettyprintduration < data/tenures.tsv \
+            | cut --fields=5 \
+            | gnuplot '${{ github.action_path }}/scripts/durationboxplot.gpi'
+
+        if [[ -z $(git status --porcelain) ]]; then
+            exit 0
+        fi
+
+        git add boxplot.svg
+        git commit --message="Update boxplot"
+        git push
