@@ -51,6 +51,12 @@ runs:
 
         '${{ github.action_path }}/scripts/slacktenure' '${{ inputs.name }}'
 
+        if [[ -n $(git status --porcelain -- README.md) ]]; then
+            git add README.md
+            git commit --message="Update README stats table"
+            git push
+        fi
+
         if [[ -z $(git status --porcelain) ]]; then
             exit 0
         fi
