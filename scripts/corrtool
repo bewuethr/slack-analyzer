@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+
+# Print usage instructions
+usage() {
+	echo "usage: ${0##*/} add | check FILE"
+}
+
+# Create a new entry for the corrections file
+add() {
+	local user delete first last
+	read -rp 'Slack user ID: ' user
+	read -rp 'Delete? (y/N): ' delete
+	read -rp 'Joined [YYYY-MM-DD]: ' first
+	read -rp 'Left [YYYY-MM-DD]: ' last
+
+	local deletebool
+	if [[ $delete == 'y' ]]; then
+		deletebool='true'
+	fi
+
+	local -n dateref
+	local re='[[:digit:]]{4}(-[[:digit:]]{2}){2}'
+	for dateref in first last; do
+		if [[ $dateref =~ $re ]]; then
+			dateref=$(date --date="$dateref" +%s)
+		elif [[ -n $dateref ]]; then
+			echo 'date must be YYYY-MM-DD or empty' >&2
+			exit 1
+		fi
+	done
+
+	if [[ -n $first ]] && [[ -n $last ]] && ((first > last)); then
+		echo 'join date cannot be after departure date' >&2
+		exit 1
+	fi
+
+	printf '%s,%s,%s,%s\n' "$user" "$deletebool" "$first" "$last"
+}
+
+# Validate provided file
+check() {
+	local fname=$1
+
+	awk '
+		BEGIN { FS = "," }
+
+		NR == 1 && ! /^id,delete,first,last$/ {
+			printf "got header line \"%s\", want \"%s\"\n", $0, "id,delete,first,last" > "/dev/stderr"
+			exit 1
+		}
+
+		NR > 1 && NF != 4 {
+			printf "line %d: got %d fields, want 4\n", NR, NF > "/dev/stderr"
+			exit 1
+		}
+
+		NR > 1 && ids[$1]++ {
+			printf "line %d: duplicate ID %s\n", NR, $1 > "/dev/stderr"
+			exit 1
+		}
+
+		NR > 1 && $2 !~ /^(true|)$/ {
+			printf "line %d: invalid value \"%s\" for delete\n", NR, $2 > "/dev/stderr"
+			exit 1
+		}
+
+		NR > 1 && $3 && $4 && $3 >= $4 {
+			printf "line %d: last (%d) is not after first (%d)\n", NR, $4, $3 > "/dev/stderr"
+			exit 1
+		}
+
+		NR > 1 && $3 !~ /^(-?[[:digit:]]+|)$/ {
+			printf "line %d: first (%s) is not a valid timestamp\n", NR, $3 > "/dev/stderr"
+			exit 1
+		}
+
+		NR > 1 && $4 !~ /^(-?[[:digit:]]+|)$/ {
+			printf "line %d: last (%s) is not a valid timestamp\n", NR, $4 > "/dev/stderr"
+			exit 1
+		}
+	' "$fname"
+}
+
+main() {
+	local subcmd=$1
+	if [[ -z $subcmd ]]; then
+		usage >&2
+		exit 1
+	fi
+
+	case $subcmd in
+		add) add ;;
+
+		check)
+			shift
+			local fname=$1
+			if [[ -z $fname ]]; then
+				usage >&2
+				exit 1
+			fi
+			check "$fname"
+			;;
+
+		*)
+			echo "invalid subcommand: $subcmd" >&2
+			usage >&2
+			exit 1
+			;;
+	esac
+}
+
+if [[ ${BASH_SOURCE[0]} == "$0" ]]; then
+	main "$@"
+fi
