@@ -64,3 +64,35 @@ This does the following:
 
 If `corrections.csv` is found in `data`, it is mentioned and linked to in the
 main README file.
+
+## `corrtool`
+
+`corrtool` is a little tool to generate new entries for `corrections.csv`, and
+to check the validity of a corrections file.
+
+`corrtool add` prompts for user input and prints the new entry to standard
+output:
+
+```console
+$ corrtool add
+Slack user ID: 123456
+Delete? (y/N): y
+Joined [YYYY-MM-DD]: 2021-01-01
+Left [YYYY-MM-DD]: 2021-03-02
+123456,true,1609477200,1614661200
+```
+
+To append to an existing corrections file and also print to standard output,
+use
+
+```sh
+corrtool add | tee -a path/to/corrections.csv
+```
+
+`corrtool check FILE` checks an existing file and prints an error message if
+something is not right:
+
+```console
+$ corrtool check path/to/corrections.csv
+line 5: duplicate ID U0111111125
+```
