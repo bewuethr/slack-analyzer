@@ -164,5 +164,5 @@ validity, looking for
 - Last timestamp not occurring before the first one
 - Valid timestamp format
 
-`corrtool` is called in `slacktenure` before `corrections.csv` is read for the
-first time.
+`corrtool` is called in the first run step in `action.yml` if `corrections.csv`
+exists.
