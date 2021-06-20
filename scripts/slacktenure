@@ -396,7 +396,11 @@ main() {
 	if ! [[ -s $difffile ]]; then
 		echo "Nothing changed!" >&2
 		rm "$difffile"
-		exit
+
+		# Get most recent previous diff
+		shopt -s globstar
+		local diffs=(diffs/**/*.diff)
+		difffile=${diffs[-1]}
 	fi
 
 	local curdir=${BASH_SOURCE[0]%/*}
