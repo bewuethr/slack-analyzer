@@ -7,6 +7,9 @@ All functionality is spread over a Bash script (`slacktenure`), two awk scripts
 `durationboxplot.gpi`). Three steps in the composite run steps action defined
 in `action.yml` tie everything together.
 
+`corrtool` is a helper script to generate entries for and validate
+`corrections.csv`.
+
 ## Update user data and generate a diff
 
 `slacktenure` gets the list of all users from the Slack workspace, and throws
@@ -146,3 +149,20 @@ for `durationboxplot.gpi`. Then, the boxplot is generated and committed if it
 has changed.
 
 [2]: <../README.md>
+
+## Corrections helper script
+
+`corrtool` is a Bash script providing two subcommands, `add` and `check`. `add`
+prompts for input and runs some validation before generating a new entry to add
+to `corrections.csv`; `check` calls an awk script that checks every entry for
+validity, looking for
+
+- Correct header line
+- Correct number of fields of every record
+- Uniqueness of Slack user IDs
+- Correct values for the `delete` field (`true` or empty)
+- Last timestamp not occurring before the first one
+- Valid timestamp format
+
+`corrtool` is called in `slacktenure` before `corrections.csv` is read for the
+first time.
