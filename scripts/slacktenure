@@ -166,17 +166,18 @@ tenureupdate() {
 				;;
 
 			'fresh')
-				if first=$(findfirst "$id" | msg2timestamp); then
-					status='active'
+				if ! first=$(findfirst "$id" | msg2timestamp); then
+					# Use "now" if no first message found
+					printf -v first '%(%s)T' -2
 				fi
+				status='active'
 
 				if [[ $deleted == 'true' ]]; then
-					if [[ $status == 'active' ]]; then
-						status='alum'
-						last=$(findlast "$id" | msg2timestamp)
-					else
-						status='noshow'
+					if ! last=$(findlast "$id" | msg2timestamp); then
+						# Use "now" if no last message found
+						printf -v last '%(%s)T' -2
 					fi
+					status='alum'
 				fi
 				;;
 		esac
