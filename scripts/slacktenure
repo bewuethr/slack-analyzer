@@ -193,14 +193,18 @@ tenureupdate() {
 }
 
 # Filter for tenures.tsv to remove headers, drop status field, sort by join
-# date, convert Unix timestamp to YYYY-MM-DD, and add employee number
+# date, drop future start dates, convert Unix timestamp to YYYY-MM-DD, and add
+# employee number
 prettyprint() {
 	sed '1d' \
 		| cut --fields=4 --complement \
 		| sort --numeric-sort --key=4,4 --field-separator=$'\t' \
 		| awk '
-			BEGIN { FS = OFS = "\t" }
-			$4 {
+			BEGIN {
+				FS = OFS = "\t"
+				now = systime()
+			}
+			$4 && $4 < now {
 				$4 = strftime("%F", $4)
 				if ($5)
 					$5 = strftime("%F", $5)
@@ -211,28 +215,34 @@ prettyprint() {
 }
 
 # Filter for tenures.tsv to remove headers, sort by join date, filter for
-# active users, convert Unix timestamp to YYYY-MM-DD, and add current employee
-# number
+# active users, drop future start dates, convert Unix timestamp to YYYY-MM-DD,
+# and add current employee number
 prettyprintcurrent() {
 	sed '1d' \
 		| sort --numeric-sort --key=5,5 --field-separator=$'\t' \
 		| awk '
-			BEGIN { FS = OFS = "\t" }
-			$4 == "active" {
+			BEGIN {
+				FS = OFS = "\t"
+				now = systime()
+			}
+			$4 == "active" && $5 < now {
 				print $1, $2, $3, strftime("%F", $5)
 			}
 		' \
 		| nl
 }
 
-# Filter for tenures.tsv to remove headers, filter for active and alum users
-# and print length of tenure in days, then sort by longest tenure, descending,
-# and add ranking
+# Filter for tenures.tsv to remove headers, filter for active and alum users,
+# drop future start dates and print length of tenure in days, then sort by
+# longest tenure, descending, and add ranking
 prettyprintduration() {
-	awk --assign now="$EPOCHSECONDS" '
-		BEGIN { FS = OFS = "\t" }
+	awk '
+		BEGIN {
+			FS = OFS = "\t"
+			now = systime()
+		}
 		NR == 1 { next }
-		$5 {
+		$5 && $5 < now {
 			$6 = $6 ? $6 : now
 			print $1, $2, $3, int(($6 - $5) / 24 / 3600)
 		}
