@@ -3,6 +3,7 @@
 BEGIN {
 	FS = OFS = "\t"
 	PROCINFO["sorted_in"] = "@ind_str_asc"
+	now = systime()
 }
 
 NR == 1 { next }
@@ -11,11 +12,11 @@ NR == 1 { next }
 	first = $5
 	last = $6
 
-	if (first) {
+	if (first && first < now) {
 		++months[strftime("%Y-%m", first)]["first"]
 	}
 
-	if (last) {
+	if (last && last < now) {
 		++months[strftime("%Y-%m", last)]["last"]
 	}
 }
