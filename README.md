@@ -130,8 +130,8 @@ messages][1].
   public Slack message
 - They are assumed to have left the company at the date of their last public
   Slack message
-- If somebody joins and leaves without ever posting a public message, they
-  don't show up in the final table
+- If no message can be found for a new user, the current time is used as an
+  estimate of when they joined
 - Employee numbers are assigned in ascending order of the timestamp of the
   first message; this isn't necessarily the true order, especially not for
   employees who joined before the company started using Slack &ndash; see
@@ -144,9 +144,9 @@ messages][1].
   `from:<@USERID>`; this means that the result depends on the user who owns the
   `USER_TOKEN` and which private channels they have access to
 
-Calls to `search.messages` retry once on error; because curl respects the
-`Retry-After` header, this slows down requests just enough when hitting the
-rate limit.
+Calls to `search.messages` retry once on error; because curl's `--retry` option
+respects the `Retry-After` header, this slows down requests just enough when
+hitting the rate limit.
 
 [2]: <https://api.slack.com/methods/users.list>
 [3]: <https://api.slack.com/methods/search.messages>
@@ -159,9 +159,10 @@ rate limit.
   ID, name, title, status, and Unix timestamp of first and last message, where
   applicable; status can be one of
   - `active`: user is still active member of the workspace
-  - `alum`: user is marked `deleted` and has a timestamp for their last message
-  - `fresh`: user is active member of the workspace, but hasn't posted yet
-  - `noshow`: user is marked `deleted` and never posted a message
+  - `alum`: user is marked `deleted` and has a "last" timestamp
+  - `fresh`: user just joined the workspace; this is replaced with `active`
+    right afterwards, either with the timestamp of their first message, or the
+    current time
 - `data/corrections.csv` is an optional file containing corrections for known
   incorrect values; it uses four comma-separated columns:
 
@@ -175,8 +176,7 @@ rate limit.
   See [Manually correcting data from Slack][4] for more details.
 
 - `tenures.md` is the Markdown-formatted view of the `data/tenures.tsv` with
-  no-shows removed, and human-readable datestamps, ordered by date of the first
-  message
+  human-readable datestamps, ordered by join date
 - `tenurescurrent.md` is the Markdown-formatted view of `tenures.tsv` with only
   current employees
 - `tenuresduration.md` is like `tenures.md`, but ordered by duration instead of
