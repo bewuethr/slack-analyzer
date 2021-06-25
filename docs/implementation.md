@@ -34,20 +34,23 @@ Then, for each user:
 - if a user was previously active and is now deleted, it gets the timestamp of
   their most recent message; this requires a Slack API user token to be set in
   the environment as `$USER_TOKEN`
-- if the user is fresh, it checks if they have posted, and if so, updates them
-  to active (unless the user has been deleted without ever posting, making them
-  a no-show)
+  - if there is no message to be found, the current time is used instead as the
+    departure date; assuming the action is run frequently, this isn't too far
+    off in most cases
+- if the user is fresh, the timestamp of their first message (or the current
+  time, if they haven't posted yet) is set as their join date and the user is
+  updated to active
 - applies corrections for first and last timestamp where available
 - prints the updated and corrected vales to `tenures_new.tsv`
 
 The intermediate `users.json` is now deleted, and a file containing the unified
 diff between `tenures_new.tsv` and `tenures.tsv` is generated. This also
 generates diff subdirectories for year and month if needed; if the diff file is
-empty, it is deleted again, and we exit. `tenures_new.tsv` is now renamed to
-`tenures.tsv`.
+empty, it is deleted again. `tenures_new.tsv` is now renamed to `tenures.tsv`.
 
-Finally, the main README is generated containing the link to the latest diff;
-if there is no corrections file, the lines mentioning it are filtered.
+Finally, the main README is generated containing the link to the latest diff
+and an update stats table; if there is no corrections file, the lines
+mentioning it are filtered.
 
 The Markdown tables are generated from `tenures.tsv` by removing the header
 row, sorting by the appropriate fields, and adding an employee number before
@@ -65,8 +68,9 @@ Slack][1].
 
 ### Known bugs
 
-- If a fresh user writes their first message shortly before being removed, they
-  are considered a no-show, even though they wrote messages
+- A user who joined and left between two runs and never posted anything will
+  show up as `alum` with identical join and departure date; probably a good
+  `delete` candidate for the corrections file
 - Double quotes in `tenures.tsv` break the GitHub pretty-printing, so they are
   replaced with single quotes
 
@@ -80,6 +84,8 @@ For each entry, awk converts the Unix timestamps to `YYYY-MM` format (which
 requires consistently using the same timezone everywhere), and counts how many
 first and last timestamps have occurred per month, representing people joining
 and leaving in that month.
+
+Start and end dates in the future (from the corrections file) are ignored.
 
 After going through all users, the script iterates over the months and prints
 the totals, as well as a running total.
@@ -117,7 +123,8 @@ required.
 In `action.yml`, three run steps tie everything together.
 
 The first step runs `slacktenure` using the required `name` input as the
-parameter. If nothing changed, it exits.
+parameter. If nothing other than the stats table and the durations changed, it
+exits.
 
 Else, the updated `tenures.tsv` file and the diff are committed and pushed.
 
@@ -165,4 +172,5 @@ validity, looking for
 - Valid timestamp format
 
 `corrtool` is called in the first run step in `action.yml` if `corrections.csv`
-exists.
+exists. Since it exits with non-zero status on error, the action stops if the
+corrections file is malformatted.
