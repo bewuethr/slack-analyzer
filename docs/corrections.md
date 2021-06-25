@@ -6,6 +6,8 @@ The data fetched from Slack can be inaccurate for a number of reasons:
   the start dates of employees before that would be wrong
 - The first or last message or way off the real date of joining/leaving the
   company
+- The fallback value of "current time" for users without a first/last message
+  might be incorrect
 - A guest was accidentally added as a full user, but never actually worked at
   the company
 - A contractor becomes a full-time employee, but has multiple Slack users
@@ -23,8 +25,8 @@ in order:
 
 1. Slack user ID as seen in `tenures.tsv`
 2. Deletion indicator (`true` to delete, else empty)
-3. The corrected timestamp of the first message
-4. The corrected timestamp of the last message
+3. The corrected timestamp of their join date
+4. The corrected timestamp of their departure date
 
 Empty fields for timestamp values mean that the original value is being used.
 
@@ -56,10 +58,11 @@ U00000004,,1562817600,1610082000
 This does the following:
 
 - User `U00000001` gets deleted and won't show up in the output
-- For user `U00000002`, the timestamp of the first message is corrected to
+- For user `U00000002`, the timestamp of the join date is corrected to
   `1422766800` (2015-02-01, using EST timezone)
-- User `U00000003` gets their last message timestamp set to `1607144400` (2020-12-05)
-- User `U00000004` get both first and last message corrected, to `1562817600`
+- User `U00000003` gets their departure date timestamp set to `1607144400`
+  (2020-12-05)
+- User `U00000004` get both join and departure date corrected, to `1562817600`
   (2019-07-11) and `1610082000` (2021-01-08)
 
 If `corrections.csv` is found in `data`, it is mentioned and linked to in the
@@ -96,3 +99,6 @@ something is not right:
 $ corrtool check path/to/corrections.csv
 line 5: duplicate ID U0111111125
 ```
+
+This is called in `action.yml` and causes the action to exit if the corrections
+file isn't properly formatted.
