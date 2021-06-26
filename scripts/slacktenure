@@ -348,7 +348,7 @@ updatereadme() {
 
 		![Employee turnover over time][turnover]
 
-		## Tenure statistics
+		## Tenure statistics (all employees ever)
 
 		$statstable
 
