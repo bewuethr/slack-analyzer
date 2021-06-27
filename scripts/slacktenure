@@ -438,7 +438,7 @@ main() {
 
 	local statstable
 	statstable=$(prettyprintduration < data/tenures.tsv \
-		| cut --fields=5 \
+		| cut --fields=6 \
 		| "$curdir/stats" \
 		| tomarkdownstats)
 
