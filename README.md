@@ -180,7 +180,7 @@ hitting the rate limit.
 - `tenurescurrent.md` is the Markdown-formatted view of `tenures.tsv` with only
   current employees
 - `tenuresduration.md` is like `tenures.md`, but ordered by duration instead of
-  join date
+  join date; rows with former employees are set in italics
 - The `diffs/YYYY/MM/*.diff` files contain the unified diffs of the TSV data
   between two updates, grouped in year and month subdirectories
 - `data/turnover.tsv` is generated from `tenures.tsv` to be used as input for
