@@ -232,9 +232,9 @@ prettyprintcurrent() {
 		| nl
 }
 
-# Filter for tenures.tsv to remove headers, filter for active and alum users,
-# drop future start dates and print length of tenure in days, then sort by
-# longest tenure, descending, and add ranking
+# Filter for tenures.tsv to remove headers, add indicator for active (current,
+# "C") and alum (former, "F") users, drop future start dates and print length
+# of tenure in days, then sort by longest tenure, descending, and add ranking
 prettyprintduration() {
 	awk '
 		BEGIN {
@@ -244,11 +244,11 @@ prettyprintduration() {
 		NR == 1 { next }
 		$5 && $5 < now {
 			$6 = $6 ? $6 : now
-			print $1, $2, $3, int(($6 - $5) / 24 / 3600)
+			print ($6 == now ? "C" : "F"), $1, $2, $3, int(($6 - $5) / 24 / 3600)
 		}
 	' \
-		| sort --numeric-sort --key=4,4 --field-separator=$'\t' --reverse \
-		| nl
+		| sort --numeric-sort --key=5,5 --field-separator=$'\t' --reverse \
+		| nl --number-width=1
 }
 
 # Filter for prettyprint output to terminal
@@ -288,14 +288,34 @@ tomarkdowncurrent() {
 	mdtablebody
 }
 
-# Filter for prettyprintduration output to Markdown
+# Filter for prettyprintduration output to Markdown; sets lines for former
+# employees in italics
 tomarkdownduration() {
 	local name=$1
-	printf '%s\n\n' "# Tenures at $name by duration"
+	printf '%s\n\n' \
+		"# Tenures at $name by duration" \
+		"Lines in *italics* indicate former employees."
 	printf '%s | %s | %s | %s | %s\n' '\#' "User ID" "Name" "Title" "Days" \
-		'--:' '---' '---' '---' '---'
+		'--:' '---' '---' '---' '--:'
 
-	mdtablebody
+	awk '
+		BEGIN { FS = OFS = "\t" }
+		$2 == "F" {
+			for (i = 1; i <= NF; ++i) {
+				if ($i && i != 2) {
+					$i = "*" $i "*"
+				}
+			}
+		}
+		{
+			line = $1
+			for (i = 3; i <= NF; ++i) {
+				line = line OFS $i
+			}
+			print line
+		}
+	' \
+		| mdtablebody
 }
 
 # Filter for stats output to Markdown
