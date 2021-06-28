@@ -127,7 +127,7 @@ runs:
         source '${{ github.action_path }}/scripts/slacktenure'
 
         prettyprintduration < data/tenures.tsv \
-            | cut --fields=5 \
+            | cut --fields=6 \
             | gnuplot '${{ github.action_path }}/scripts/durationboxplot.gpi'
 
         if [[ -z $(git status --porcelain) ]]; then
