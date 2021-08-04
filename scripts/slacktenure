@@ -303,6 +303,7 @@ tomarkdownduration() {
 		$2 == "F" {
 			for (i = 1; i <= NF; ++i) {
 				if ($i && i != 2) {
+					gsub(/^[[:blank:]]+|[[:blank:]]+$/, "", $i)
 					$i = "*" $i "*"
 				}
 			}
