@@ -22,6 +22,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
           VALIDATE_ALL_CODEBASE: true
+          FILTER_REGEX_EXCLUDE: img/.*
 
           VALIDATE_BASH: true
           VALIDATE_BASH_EXEC: true
