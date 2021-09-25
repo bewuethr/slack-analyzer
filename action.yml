@@ -62,12 +62,15 @@ runs:
         fi
 
         if [[ -z $(git status --porcelain) ]]; then
+            echo "No new tenure data found" >&2
             exit 0
         fi
 
         git add data/tenures.tsv diffs *.md
         git commit --message="Update tenures"
         git push
+
+        echo "Building diff message..." >&2
 
         shopt -s globstar
 
@@ -90,6 +93,7 @@ runs:
       shell: bash
       run: |
         if [[ '${{ env.continue }}' != 'true' ]]; then
+            echo "Tenure data hasn't changed, not recreating graph" >&2
             exit 0
         fi
 
@@ -97,6 +101,7 @@ runs:
             data/tenures.tsv > data/turnover.tsv
 
         if [[ -z $(git status --porcelain) ]]; then
+            echo "Turnover data hasn't changed, not recreating graph" >&2
             exit 0
         fi
 
@@ -121,6 +126,8 @@ runs:
             sudo apt-get install gnuplot-nox
         fi
 
+        echo "Updating boxplot..." >&2
+
         source '${{ github.action_path }}/scripts/slacktenure'
 
         prettyprintduration < data/tenures.tsv \
@@ -128,6 +135,7 @@ runs:
             | gnuplot '${{ github.action_path }}/scripts/durationboxplot.gpi'
 
         if [[ -z $(git status --porcelain) ]]; then
+            echo "Boxplot hasn't changed" >&2
             exit 0
         fi
 
