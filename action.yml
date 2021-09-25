@@ -22,15 +22,13 @@ inputs:
     description: Slack API user token with search:read scope
     required: true
 
-outputs:
+  telegram-to:
+    description: Telegram channel ID
+    required: true
 
-  diff-msg:
-    description: The generated diff, formatted for Telegram
-    value: ${{ steps.update.outputs.diff-msg }}
-
-  graph-path:
-    description: The path to the PNG of the generated graph
-    value: ${{ steps.graph.outputs.path }}
+  telegram-token:
+    description: Telegram authorization token
+    required: true
 
 runs:
 
@@ -39,7 +37,6 @@ runs:
   steps:
 
     - name: Update tenures via Slack API
-      id: update
       shell: bash
       env:
         BOT_TOKEN: ${{ inputs.slack-bot-token }}
@@ -87,11 +84,9 @@ runs:
         printf -v msg '%s\n' "$links" '' '```diff' "$(< "$diff")" '```'
         escapedmsg=$(jq --raw-input --slurp '.' <<< "$msg")
 
-        echo "::set-output name=diff-msg::$escapedmsg"
-        echo 'continue=true' >> "$GITHUB_ENV"
+        printf '%s\n' "escapedmsg=$escapedmsg" 'continue=true' >> "$GITHUB_ENV"
 
     - name: Update graph
-      id: graph
       shell: bash
       run: |
         if [[ '${{ env.continue }}' != 'true' ]]; then
@@ -116,7 +111,7 @@ runs:
         git commit --message="Update graph"
         git push
 
-        echo "::set-output name=path::turnover.png"
+        echo "graphpath=turnover.png" >> "$GITHUB_ENV"
 
     - name: Update boxplot
       shell: bash
@@ -139,3 +134,19 @@ runs:
         git add boxplot.svg
         git commit --message="Update boxplot"
         git push
+
+    - name: Send Telegram message for change
+      uses: appleboy/telegram-action@v0.1.1
+      with:
+        to: ${{ inputs.telegram-to }}
+        token: ${{ inputs.telegram-token }}
+        format: markdown
+        message: ${{ fromJSON(env.escapedmsg) }}
+
+    - name: Send Telegram message for graph
+      uses: appleboy/telegram-action@v0.1.1
+      with:
+        to: ${{ inputs.telegram-to }}
+        token: ${{ inputs.telegram-token }}
+        photo: ${{ env.graphpath }}
+        message: ' '
