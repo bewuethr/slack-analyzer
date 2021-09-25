@@ -63,6 +63,7 @@ runs:
 
         if [[ -z $(git status --porcelain) ]]; then
             echo "No new tenure data found" >&2
+            echo "escapedmsg=' '" >> "$GITHUB_ENV"
             exit 0
         fi
 
