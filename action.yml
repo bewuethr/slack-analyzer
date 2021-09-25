@@ -89,42 +89,11 @@ runs:
 
         printf '%s\n' "escapedmsg=$escapedmsg" 'continue=true' >> "$GITHUB_ENV"
 
-    - name: Update graph
-      shell: bash
-      run: |
-        if [[ '${{ env.continue }}' != 'true' ]]; then
-            echo "Tenure data hasn't changed, not recreating graph" >&2
-            exit 0
-        fi
-
-        '${{ github.action_path }}/scripts/generateturnover' \
-            data/tenures.tsv > data/turnover.tsv
-
-        if [[ -z $(git status --porcelain) ]]; then
-            echo "Turnover data hasn't changed, not recreating graph" >&2
-            exit 0
-        fi
-
-        sudo apt-get update
-        sudo apt-get install gnuplot-nox
-        echo 'gpinstalled=true' >> "$GITHUB_ENV"
-        for type in svg png; do
-            gnuplot -c '${{ github.action_path }}/scripts/turnover.gpi' "$type"
-        done
-
-        git add data/turnover.tsv turnover.svg
-        git commit --message="Update graph"
-        git push
-
-        echo "graphpath=turnover.png" >> "$GITHUB_ENV"
-
     - name: Update boxplot
       shell: bash
       run: |
-        if [[ '${{ env.gpinstalled }}' != 'true' ]]; then
-            sudo apt-get update
-            sudo apt-get install gnuplot-nox
-        fi
+        sudo apt-get update
+        sudo apt-get install gnuplot-nox
 
         echo "Updating boxplot..." >&2
 
@@ -142,6 +111,32 @@ runs:
         git add boxplot.svg
         git commit --message="Update boxplot"
         git push
+
+    - name: Update graph
+      shell: bash
+      run: |
+        if [[ '${{ env.continue }}' != 'true' ]]; then
+            echo "Tenure data hasn't changed, not recreating graph" >&2
+            exit 0
+        fi
+
+        '${{ github.action_path }}/scripts/generateturnover' \
+            data/tenures.tsv > data/turnover.tsv
+
+        if [[ -z $(git status --porcelain) ]]; then
+            echo "Turnover data hasn't changed, not recreating graph" >&2
+            exit 0
+        fi
+
+        for type in svg png; do
+            gnuplot -c '${{ github.action_path }}/scripts/turnover.gpi' "$type"
+        done
+
+        git add data/turnover.tsv turnover.svg
+        git commit --message="Update graph"
+        git push
+
+        echo "graphpath=turnover.png" >> "$GITHUB_ENV"
 
     - name: Send Telegram message for change
       uses: appleboy/telegram-action@v0.1.1
