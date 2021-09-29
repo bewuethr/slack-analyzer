@@ -24,11 +24,11 @@ inputs:
 
   telegram-to:
     description: Telegram channel ID
-    required: true
+    required: false
 
   telegram-token:
     description: Telegram authorization token
-    required: true
+    required: false
 
 runs:
 
