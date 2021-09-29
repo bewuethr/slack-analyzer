@@ -1,7 +1,12 @@
 # Slack analyzer
 
-[![Lint code base](https://github.com/bewuethr/slack-analyzer/actions/workflows/linter.yml/badge.svg)](https://github.com/bewuethr/slack-analyzer/actions/workflows/linter.yml)
-[![Move release tags](https://github.com/bewuethr/slack-analyzer/actions/workflows/releasetracker.yml/badge.svg)](https://github.com/bewuethr/slack-analyzer/actions/workflows/releasetracker.yml)
+[![Lint code base][lintbadge]][lintworkflow]
+[![Move release tags][tagbadge][tagworkflow]
+
+[lintbadge]:    <https://github.com/bewuethr/slack-analyzer/actions/workflows/linter.yml/badge.svg>
+[lintworkflow]: <https://github.com/bewuethr/slack-analyzer/actions/workflows/linter.yml>
+[tagbadge]:     <https://github.com/bewuethr/slack-analyzer/actions/workflows/releasetracker.yml/badge.svg>
+[tagworkflow]:  <https://github.com/bewuethr/slack-analyzer/actions/workflows/releasetracker.yml>
 
 Slack analyzer is a GitHub Action to fetch all users from a Slack workspace and
 determine when they joined and potentially left the workspace. This is used as
