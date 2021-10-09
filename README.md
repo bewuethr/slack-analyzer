@@ -29,7 +29,7 @@ join date, and all tenures by duration. The README links to all relevant files.
 | ![Current tenures](img/example-tenures-current.png) | ![Durations](img/example-tenures-duration.png) |
 
 Optionally, the action output can be used to send the latest diff and the graph
-to a Telegram channel, using a separate action.
+to a Telegram channel.
 
 | Example Telegram diff message          | Example Telegram graph message           |
 | -------------------------------------- | ---------------------------------------- |
@@ -52,19 +52,15 @@ workspace; this is required to fetch the list of users from the workspace.
 **Required** A Slack API user token with the `search:read` scope for the
 workspace; this is required to fetch the first and last message of a user.
 
-## Outputs
+### `telegram-to`
 
-### `diff-msg`
+**Optional** A Telegram channel ID; this isn't required, but the action exits
+with an error status if it is missing.
 
-The latest diff in tenures, formatted for Telegram and JSON-escaped. Use
-`fromJSON` to unescape. If there was no diff, the string is empty; this should
-be checked before trying to use the diff.
+### `telegram-token`
 
-### `graph-path`
-
-The path to the PNG version of the turnover graph for usage in a Telegram
-message (which does not support SVG). If no new graph was generated, the string
-is empty; this should be checked before trying to use the graph in a message.
+**Optional** A Telegram authorization token; this isn't required, but the
+action exits with an error status if it is missing.
 
 ## Example usage
 
@@ -95,37 +91,17 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Update Slack workspace analysis
-      id: update
       uses: bewuethr/slack-analyzer@v0
       with:
         name: Foo Corp
         slack-bot-token: ${{ secrets.BOT_TOKEN }}
         slack-user-token: ${{ secrets.USER_TOKEN }}
-
-    - name: Send Telegram message for change
-      # Don't send message if there is no diff
-      if: steps.update.outputs.diff-msg != ''
-      uses: appleboy/telegram-action@v0.1.1
-      with:
-        to: ${{ secrets.TELEGRAM_TO }}
-        token: ${{ secrets.TELEGRAM_TOKEN }}
-        format: markdown
-        message: ${{ fromJSON(steps.update.outputs.diff-msg) }}
-
-    - name: Send Telegram message for graph
-      # Don't send graph if it was not generated
-      if: steps.update.outputs.graph-path != ''
-      uses: appleboy/telegram-action@v0.1.1
-      with:
-        to: ${{ secrets.TELEGRAM_TO }}
-        token: ${{ secrets.TELEGRAM_TOKEN }}
-        photo: ${{ steps.update.outputs.graph-path }}
-        # Required to avoid sending separate extra message
-        message: ' '
+        telegram-to: ${{ secrets.TELEGRAM_TO }}
+        telegram-token: ${{ secrets.TELEGRAM_TOKEN }}
 ```
 
-For details about using Telegram, see [Use a GitHub action to send Telegram
-messages][1].
+For details about using Telegram, see [Publishing updates to a Telegram
+channel][1].
 
 [1]: <docs/telegram.md>
 
