@@ -4,8 +4,8 @@ Scripts live in the `scripts` subdirectory.
 
 All functionality is spread over a Bash script (`slacktenure`), two awk scripts
 (`generateturnover` and `stats`), and two gnuplot scripts (`turnover.gpi` and
-`durationboxplot.gpi`). Three steps in the composite run steps action defined
-in `action.yml` tie everything together.
+`durationboxplot.gpi`). Five steps in the composite steps action defined in
+`action.yml` tie everything together.
 
 `corrtool` is a helper script to generate entries for and validate
 `corrections.csv`.
@@ -73,6 +73,7 @@ Slack][1].
   `delete` candidate for the corrections file
 - Double quotes in `tenures.tsv` break the GitHub pretty-printing, so they are
   replaced with single quotes
+- Users who leave the Slack space and return later aren't handled well
 
 ## Generate input data for the turnover graph
 
@@ -118,13 +119,13 @@ prettyprint functions.
 for that data; it reads the data from standard input so no intermediate file is
 required.
 
-## Tying everything together in a composite run steps action
+## Tying everything together in a composite steps action
 
-In `action.yml`, three run steps tie everything together.
+In `action.yml`, five run steps tie everything together.
 
-The first step runs `slacktenure` using the required `name` input as the
-parameter. If nothing other than the stats table and the durations changed, it
-exits.
+The first step runs the corrections script and then `slacktenure` using the
+required `name` input as the parameter. If nothing other than the stats table
+and the durations changed, it exits.
 
 Else, the updated `tenures.tsv` file and the diff are committed and pushed.
 
@@ -133,29 +134,26 @@ Telegram message:
 
 - The URLs for the updated files are generated
 - The diff message is JSON-escaped
-- The `diff-msg` output is set
-- The `continue` environment variable is set to `true`
+- The `escapedmsg` and `continue` environment variables are set
 
-The second step generates the graph, but only when required: if `continue` is
-not `true`, it exits. Notice that composite run steps can't use an `if:` field,
-so the check happens in the Bash script.
+The second step installs gnuplot, sources `slacktenure` (which is written to
+not execute anything when sourced so it doubles as a library) and uses
+functions to produce input for `durationboxplot.gpi`. Then, the boxplot is
+generated and committed if it has changed.
 
-Then, `generateurnover` is run; if this modifies `turnover.tsv`, gnuplot is
-installed and the `turnover.gpi` script is run, once for SVG, and once for PNG.
+The third step generates the graph, but only when required: if `continue` is
+not `true`, it exits. Notice that composite steps can't use an `if:` field, so
+the check happens in the Bash script.
 
-The new files are committed, and the `path` output is set to the path of the
-PNG graph; as an output of the action overall, it's called `graph-path`.
+Then, `generateurnover` is run; if this modifies `turnover.tsv`, the
+`turnover.gpi` script is run, once for SVG, and once for PNG.
 
-See the [main README][2] for a usage example of the outputs to send Telegram
-messages.
+The new files are committed, and the `graphpath` environment variable is set to
+the path of the PNG graph.
 
-The third step also installs gnuplot (unless that happened in the second step
-already), then sources `slacktenure` (which is written to not execute anything
-when sourced so it doubles as a library) and uses functions to produce input
-for `durationboxplot.gpi`. Then, the boxplot is generated and committed if it
-has changed.
-
-[2]: <../README.md>
+The fourth and fifth step use an existing action to send Telegram messages with
+the diff and the graph. If the message is just the empty string or if the photo
+path isn't set, the messages aren't sent.
 
 ## Corrections helper script
 
