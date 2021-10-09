@@ -73,45 +73,25 @@ This is documented in the [BotFather documentation][1].
 
 [2]: <https://core.telegram.org/bots/api#getupdates>
 
-## Use a GitHub action to send Telegram messages
+## Sending Telegram messages as part of the action
 
 Armed with the token and the channel ID, we can send messages to our new
-channel. An easy way for doing so is [appleboy/telegram-action][3].
+channel. The Slack analyzer action uses [appleboy/telegram-action][3] for this
+(transparently).
 
-Assuming the Slack analyzer action is run in a step with ID `update`, the step
-to send the diff would look like this:
-
-```yaml
-- name: Send Telegram message for change
-  # Do not send anything if the diff is empty
-  if: steps.update.outputs.diff-msg != ''
-  uses: appleboy/telegram-action@v0.1.1
-  with:
-    # The channel ID
-    to: ${{ secrets.TELEGRAM_TO }}
-    # The authorization token
-    token: ${{ secrets.TELEGRAM_TOKEN }}
-    format: markdown
-    # fromJSON is required to unescape the diff message
-    message: ${{ fromJSON(steps.update.outputs.diff-msg) }}
-```
-
-And the step to send the graph:
+All that has to be done is setting the optional `telegram-to` and
+`telegram-token` inputs; assuming they are stored as secrets `TELEGRAM_TO` and
+`TELEGRAM_TOKEN`:
 
 ```yaml
-- name: Send Telegram message for graph
-  # Don't send anything if the path has not been set
-  if: steps.update.outputs.graph-path != ''
-  uses: appleboy/telegram-action@v0.1.1
+- name: Update Slack workspace analysis
+  uses: bewuethr/slack-analyzer@v0
   with:
-    # The channel ID
-    to: ${{ secrets.TELEGRAM_TO }}
-    # The authorization token
-    token: ${{ secrets.TELEGRAM_TOKEN }}
-    # Set by the slack-analyzer step
-    photo: ${{ steps.update.outputs.graph-path }}
-    # Required to avoid an extra, empty message
-    message: ' '
+    name: Foo Corp
+    slack-bot-token: ${{ secrets.BOT_TOKEN }}
+    slack-user-token: ${{ secrets.USER_TOKEN }}
+    telegram-to: ${{ secrets.TELEGRAM_TO }}
+    telegram-token: ${{ secrets.TELEGRAM_TOKEN }}
 ```
 
 And that's it! Happy telegramming!
