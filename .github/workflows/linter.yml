@@ -27,6 +27,7 @@ jobs:
           VALIDATE_BASH: true
           VALIDATE_BASH_EXEC: true
           VALIDATE_GITHUB_ACTIONS: true
+          VALIDATE_GITLEAKS: true
           VALIDATE_JSCPD: true
           VALIDATE_MARKDOWN: true
           VALIDATE_SHELL_SHFMT: true
