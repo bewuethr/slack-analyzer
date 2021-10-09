@@ -1,7 +1,7 @@
 # Slack analyzer
 
 [![Lint code base][lintbadge]][lintworkflow]
-[![Move release tags][tagbadge][tagworkflow]
+[![Move release tags][tagbadge]][tagworkflow]
 
 [lintbadge]:    <https://github.com/bewuethr/slack-analyzer/actions/workflows/linter.yml/badge.svg>
 [lintworkflow]: <https://github.com/bewuethr/slack-analyzer/actions/workflows/linter.yml>
