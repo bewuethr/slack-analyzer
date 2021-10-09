@@ -112,7 +112,8 @@ gettenure() {
 				}
 				print ""
 			}
-	}' "$infile"
+		}
+	' "$infile"
 }
 
 # Check corrfile to see if it contains corrected values for the user identified
