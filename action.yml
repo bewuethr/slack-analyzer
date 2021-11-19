@@ -63,7 +63,6 @@ runs:
 
         if [[ -z $(git status --porcelain) ]]; then
             echo "No new tenure data found" >&2
-            echo "escapedmsg=' '" >> "$GITHUB_ENV"
             exit 0
         fi
 
@@ -114,13 +113,9 @@ runs:
         git push
 
     - name: Update graph
+      if: env.continue
       shell: bash
       run: |
-        if [[ '${{ env.continue }}' != 'true' ]]; then
-            echo "Tenure data hasn't changed, not recreating graph" >&2
-            exit 0
-        fi
-
         '${{ github.action_path }}/scripts/generateturnover' \
             data/tenures.tsv > data/turnover.tsv
 
@@ -140,6 +135,10 @@ runs:
         echo "graphpath=turnover.png" >> "$GITHUB_ENV"
 
     - name: Send Telegram message for change
+      if: >-
+        env.escapedmsg != ''
+            && inputs.telegram-to != ''
+            && inputs.telegram-token != ''
       uses: appleboy/telegram-action@v0.1.1
       with:
         to: ${{ inputs.telegram-to }}
@@ -148,6 +147,10 @@ runs:
         message: ${{ fromJSON(env.escapedmsg) }}
 
     - name: Send Telegram message for graph
+      if: >-
+        env.graphpath != ''
+            && inputs.telegram-to != ''
+            && inputs.telegram-token != ''
       uses: appleboy/telegram-action@v0.1.1
       with:
         to: ${{ inputs.telegram-to }}
