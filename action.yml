@@ -52,7 +52,9 @@ runs:
         git config --global user.email \
             '41898282+github-actions[bot]@users.noreply.github.com'
 
+        echo "::group::Run slacktenure script"
         '${{ github.action_path }}/scripts/slacktenure' '${{ inputs.name }}'
+        echo "::endgroup::"
 
         files=(README.md tenuresduration.md)
         if [[ -n $(git status --porcelain -- "${files[@]}") ]]; then
@@ -92,8 +94,10 @@ runs:
     - name: Update boxplot
       shell: bash
       run: |
-        sudo apt-get update
-        sudo apt-get install gnuplot-nox
+        echo "::group::Install gnuplot"
+        sudo apt-get --quiet update
+        sudo apt-get install --quiet gnuplot-nox
+        echo "::endgroup::"
 
         echo "Updating boxplot..." >&2
 
