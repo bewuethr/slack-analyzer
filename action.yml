@@ -96,7 +96,7 @@ runs:
       run: |
         echo "::group::Install gnuplot"
         sudo apt-get --quiet update
-        sudo apt-get --quiet install gnuplot-nox
+        sudo apt-get -qq install gnuplot-nox
         echo "::endgroup::"
 
         echo "Updating boxplot..." >&2
