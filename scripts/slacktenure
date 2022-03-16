@@ -206,9 +206,9 @@ prettyprint() {
 				now = systime()
 			}
 			$4 && $4 < now {
-				$4 = strftime("%F", $4)
+				$4 = strftime("%Y‑%m‑%d", $4)
 				if ($5)
-					$5 = strftime("%F", $5)
+					$5 = strftime("%Y‑%m‑%d", $5)
 				print
 			}
 		' \
@@ -227,7 +227,7 @@ prettyprintcurrent() {
 				now = systime()
 			}
 			$4 == "active" && $5 < now {
-				print $1, $2, $3, strftime("%F", $5)
+				print $1, $2, $3, strftime("%Y‑%m‑%d", $5)
 			}
 		' \
 		| nl
