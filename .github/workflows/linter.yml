@@ -20,4 +20,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DEFAULT_BRANCH: main
-          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' }}
+          VALIDATE_ALL_CODEBASE: |
+            ${{ github.event_name == 'push' && github.ref_name == 'main' }}
