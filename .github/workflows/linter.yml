@@ -23,13 +23,3 @@ jobs:
           DEFAULT_BRANCH: main
           VALIDATE_ALL_CODEBASE: |
             ${{ github.event_name == 'push' && github.ref_name == 'main' }}
-          FILTER_REGEX_EXCLUDE: img/.*
-
-          VALIDATE_BASH: true
-          VALIDATE_BASH_EXEC: true
-          VALIDATE_GITHUB_ACTIONS: true
-          VALIDATE_GITLEAKS: true
-          VALIDATE_JSCPD: true
-          VALIDATE_MARKDOWN: true
-          VALIDATE_SHELL_SHFMT: true
-          VALIDATE_YAML: true
