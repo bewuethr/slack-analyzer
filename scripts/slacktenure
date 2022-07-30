@@ -1,19 +1,48 @@
 #!/usr/bin/env bash
 
-# Fetch complete users list from Slack API
-getusers() {
-	curl https://slack.com/api/users.list \
-		--silent \
-		--get \
-		--data 'pretty=1' \
+# Fetch one page of users list from Slack API
+getuserspage() {
+	local cursor=$1
+	local args=(
+		--silent
+		--get
+		--data 'pretty=1'
 		--header "Authorization: Bearer $BOT_TOKEN"
+	)
+
+	if [[ -n $cursor ]]; then
+		args+=(--data "cursor=$cursor")
+	fi
+
+	curl "${args[@]}" https://slack.com/api/users.list
+}
+
+# Get next_cursor from payload
+extractcursor() {
+	local -n payload=$1
+	jq --raw-output '.response_metadata.next_cursor' <<< "$payload"
+}
+
+# Make calls to get users until there is no more next cursor
+getusers() {
+	local page cursor
+	page=$(getuserspage)
+	printf '%s\n' "$page"
+	cursor=$(extractcursor page)
+
+	while [[ -n $cursor ]]; do
+		page=$(getuserspage "$cursor")
+		printf '%s\n' "$page"
+		cursor=$(extractcursor page)
+	done
 }
 
 # Remove bot and guest users
 extractfullusers() {
-	jq '
-		.members |
-		map(select(
+	jq --slurp '
+		map(.members)
+		| add
+		| map(select(
 			(
 				.is_bot or .is_restricted
 				| not
