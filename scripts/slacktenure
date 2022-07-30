@@ -15,8 +15,8 @@ extractfullusers() {
 		.members |
 		map(select(
 			(
-				.is_bot or .is_restricted |
-				not
+				.is_bot or .is_restricted
+				| not
 			)
 			and .name != "slackbot"
 		))
@@ -76,8 +76,8 @@ msg2timestamp() {
 		if .messages.total == 0 then
 			"" | halt_error(1)
 		else
-			.messages.matches[0].ts |
-			if test("[.]") then
+			.messages.matches[0].ts
+			| if test("[.]") then
 				split(".")[0]
 			else
 				.
@@ -89,9 +89,9 @@ msg2timestamp() {
 # Convert user JSON to TSV input required for first/last lookup
 extractids() {
 	jq --raw-output '
-		map([.id, .profile.real_name, .deleted, .profile.title]) |
-		.[] |
-		@tsv
+		map([.id, .profile.real_name, .deleted, .profile.title])
+		| .[]
+		| @tsv
 	'
 }
 
