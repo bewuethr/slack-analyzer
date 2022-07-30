@@ -8,11 +8,9 @@ on:
 
 jobs:
   add-to-project:
-    name: Add issue to project
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Add issue
-        uses: actions/add-to-project@v0.3.0
-        with:
-          project-url: https://github.com/users/bewuethr/projects/1
-          github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
+    name: Add issues and PRs
+    uses: bewuethr/workflows/.github/workflows/addtoproject.yml@main
+    with:
+      project-url: https://github.com/users/bewuethr/projects/1
+    secrets:
+      github-token: ${{ secrets.ADD_TO_PROJECT_PAT }}
