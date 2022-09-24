@@ -191,7 +191,10 @@ tenureupdate() {
 				if [[ $deleted == 'true' ]]; then
 					# Newly alum, get last
 					status='alum'
-					last=$(findlast "$id" | msg2timestamp)
+					if ! last=$(findlast "$id" | msg2timestamp); then
+						# Use "now" if no last message found
+						printf -v last '%(%s)T' -2
+					fi
 				fi
 				;;
 
