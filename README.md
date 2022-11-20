@@ -84,7 +84,7 @@ env:
 jobs:
   update:
     name: Update tenures and graph
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
   steps:
     - name: Check out repository
