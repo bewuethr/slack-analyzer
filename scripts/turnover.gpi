@@ -3,6 +3,14 @@ set terminal filetype size 1024,600 background rgb "white"
 
 set output "turnover.".filetype
 
+infile = "data/turnover.tsv"
+
+stats infile using 3 nooutput
+ymin = int(STATS_max) % 10 - 10 - STATS_max
+
+stats infile using 4 nooutput
+ymax = STATS_max + 20 - int(STATS_max) % 10
+
 set xdata time
 set timefmt "%Y-%m"
 set format x "%Y-%m"
@@ -15,8 +23,8 @@ set ytics 50
 set mytics 5
 set y2tics 50
 set my2tics 5
-set yrange [-20:]
-set y2range [-20:]
+set yrange [ymin:ymax]
+set y2range [ymin:ymax]
 
 set style line 1 linecolor rgbcolor "#909090" dashtype "-"
 set style line 2 linecolor rgbcolor "#A0A0A0" dashtype "."
@@ -27,7 +35,7 @@ set boxwidth 0.8 relative
 set style fill solid 0.7
 boxwidth = 3600 * 24 * 20
 
-plot "data/turnover.tsv" skip 1 using 1:4 with linespoints pointinterval 6 pointtype 7 pointsize 0.5 title "Total", \
+plot infile skip 1 using 1:4 with linespoints pointinterval 6 pointtype 7 pointsize 0.5 title "Total", \
 	'' skip 1 using 1:4:(strcol(4)) every 6 with labels textcolor rgbcolor "#707070" offset -1,0.5 notitle, \
 	'' skip 1 using 1:2:(boxwidth) with boxes title "Joined", \
 	'' skip 1 using 1:(-$3):(boxwidth) with boxes title "Left"
