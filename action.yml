@@ -143,7 +143,7 @@ runs:
         env.escapedmsg != ''
             && inputs.telegram-to != ''
             && inputs.telegram-token != ''
-      uses: appleboy/telegram-action@v0.1.1
+      uses: appleboy/telegram-action@v1.0.0
       with:
         to: ${{ inputs.telegram-to }}
         token: ${{ inputs.telegram-token }}
@@ -155,7 +155,7 @@ runs:
         env.graphpath != ''
             && inputs.telegram-to != ''
             && inputs.telegram-token != ''
-      uses: appleboy/telegram-action@v0.1.1
+      uses: appleboy/telegram-action@v1.0.0
       with:
         to: ${{ inputs.telegram-to }}
         token: ${{ inputs.telegram-token }}
